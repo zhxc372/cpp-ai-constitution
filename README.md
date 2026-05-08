@@ -1,5 +1,7 @@
 # cpp-ai-constitution
 
+**English** | [中文](README_CN.md)
+
 A lightweight AI-oriented C++ engineering constitution inspired by C++ Core Guidelines.
 
 This project is NOT a C++ tutorial.
