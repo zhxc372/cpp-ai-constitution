@@ -90,10 +90,15 @@ def check_readme_references():
             continue
         text = path.read_text()
         import re
-        refs = re.findall(r'`([^`]+\.(?:md|yml|yaml|json|py|sh))`', text)
+        # First remove code blocks to avoid matching command arguments
+        text_no_code = re.sub(r'```.*?```', '', text, flags=re.DOTALL)
+        refs = re.findall(r'`([^`]+\.(?:md|yml|yaml|json|py|sh))`', text_no_code)
         for ref in set(refs):
             # Skip globs
             if '*' in ref:
+                continue
+            # Skip command-line arguments that look like paths
+            if '=' in ref or '--' in ref:
                 continue
             # Try as-is, then with common prefixes
             candidates = [ref]
@@ -149,6 +154,9 @@ def main():
         "README.md", "README_CN.md",
         "references/rule-map.md",
         "config/.clang-format",
+        "config/clang-tidy.minimal.yml",
+        "config/clang-tidy.migration.yml",
+        "config/clang-tidy.strict.yml",
     ]
     for f in essentials:
         check_file_exists(f)
