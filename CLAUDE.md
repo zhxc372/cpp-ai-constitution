@@ -1,28 +1,35 @@
 # C++ AI Constitution
 
-## Core Rules
+## Ownership
 
-- Use RAII for all resource ownership.
-- Do not use raw `new` / `delete` in application code.
-- Prefer `std::unique_ptr` for ownership.
-- Use `std::shared_ptr` only for real shared ownership.
-- Raw pointers and references are non-owning.
-- Prefer `std::span` and `std::string_view` for non-owning views.
-- Avoid global mutable state.
-- Prefer small, explicit interfaces.
-- Prefer return values over output parameters.
-- Mark single-argument constructors as `explicit`.
-- Mark read-only member functions as `const`.
-- Always initialize objects.
-- Prefer standard library containers and algorithms.
-- Use project-defined Result/expected style consistently.
-- Avoid detached threads.
-- Shared mutable state must be protected.
-- `clang-format` and `clang-tidy` must pass before commit.
+- RAII for all resources. No raw `new`/`delete`.
+- `unique_ptr` by default. `shared_ptr` only for genuine shared ownership.
+- Raw pointers/references are non-owning.
+- `span` and `string_view` for non-owning views. Watch lifetime.
+
+## Concurrency
+
+- No shared mutable state without protection.
+- Prefer message passing over locks.
+- No detached threads.
+- Document lock ordering.
+
+## Error Handling
+
+- One strategy per module: exceptions, `expected`, `Result`, or `error_code`.
+- Never throw from destructors.
+- Never silently swallow errors.
+
+## Interfaces
+
+- Small, explicit, `const`-correct.
+- `explicit` on single-arg constructors.
+- Return values over output parameters.
 
 ## Workflow
 
-1. Read spec and architecture docs first.
-2. Keep changes minimal and localized.
-3. Run format + static analysis before finalizing.
-4. Prefer readability over cleverness.
+1. Check project tooling first (clang-tidy, compile_commands.json).
+2. Classify ownership before changing pointer types.
+3. Safety fixes before style changes.
+4. Run format + static analysis before commit.
+5. Profile before optimizing.

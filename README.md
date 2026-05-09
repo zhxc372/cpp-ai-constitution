@@ -2,415 +2,127 @@
 
 **English** | [中文](README_CN.md)
 
-A lightweight AI-oriented C++ engineering constitution inspired by C++ Core Guidelines.
+A C++ code review behavior system for AI agents. Not a compressed textbook — a judgment engine.
 
-This project is NOT a C++ tutorial.
+Inspired by C++ Core Guidelines and [Perplexity's Skill design methodology](https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity).
 
-It is an engineering constraint system designed for:
-- Claude Code
-- Cursor
-- OpenCode
-- OpenClaw
-- Gemini CLI
-- Codex CLI
-- AI-assisted software engineering workflows
+## What This Is
 
-The goal is:
+An AI-readable engineering constraint system that helps agents:
 
-- reduce AI randomness
-- improve consistency
-- enforce ownership semantics
-- stabilize architecture
-- reduce review cost
-- reduce hallucinated coding patterns
+- Identify high-impact C++ mistakes (not recite C++ trivia)
+- Classify ownership before changing pointer types
+- Run mechanical checks before subjective review
+- Separate safety fixes from style rewrites
+- Know when exceptions to "modern C++" rules apply
 
----
+## What This Is Not
 
-# Philosophy
+- A C++ tutorial
+- A compressed copy of C++ Core Guidelines
+- A "modernize everything" enforcement tool
+- Something you load once and forget
 
-Strong constraints reduce entropy.
+## Philosophy
 
-Large software systems usually fail because of:
+From [Perplexity's Skill research](https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity):
 
-- ownership confusion
-- inconsistent interfaces
-- architecture drift
-- hidden side effects
-- concurrency mistakes
-- style fragmentation
+> If the implementation is easy to explain, the model already knows it. Delete it.
+> Gotchas ARE the special cases. They're the highest-value content.
 
-NOT because developers lacked clever tricks.
+This project follows those principles:
 
-This repository converts parts of the C++ Core Guidelines into:
-- AI-readable rules
-- static analysis constraints
-- engineering workflow hooks
+- Skip what models already know
+- Focus on AI failure patterns (gotchas)
+- Progressive loading (not everything at once)
+- Tool-backed checks over subjective review
 
----
-
-# Directory Structure
+## Directory Structure
 
 ```text
 cpp-ai-constitution/
-├── CLAUDE.md
-├── README.md
-├── docs/rules/
-│   ├── core-subset.md
-│   ├── ownership.md
-│   ├── concurrency.md
-│   ├── error-handling.md
-│   └── forbidden-patterns.md
-├── hooks/
-│   ├── pre-commit.sh
-│   └── ai-check.sh
-├── config/
+├── SKILL.md                    # Root: routing, priorities, constitution
+├── CLAUDE.md                   # Compact rule summary for Claude Code
+├── GOTCHAS.md                  # AI failure patterns in C++
+├── references/                 # Detailed rules (loaded conditionally)
+│   ├── rule-map.md             # Which rules apply when
+│   ├── lifetime.md             # Ownership and lifetime hazards
+│   ├── resource-management.md  # RAII patterns and traps
+│   ├── concurrency.md          # Thread safety rules
+│   ├── error-handling.md       # Exception and error strategy
+│   ├── interfaces.md           # API design rules
+│   ├── classes.md              # Class design rules
+│   ├── templates.md            # Template and concept rules
+│   └── performance.md          # Performance review checklist
+├── scripts/                    # Automation
+│   ├── detect_cpp_project.py   # Identify C++ project structure
+│   ├── find_compile_commands.py # Locate or generate compile_commands.json
+│   └── run_clang_tidy.py       # Run clang-tidy with summary
+├── assets/                     # Templates
+│   ├── review-report-template.md
+│   ├── refactor-plan-template.md
+│   └── risk-levels.md
+├── hooks/                      # Git hooks
+│   ├── pre-commit.sh           # Format + static analysis
+│   └── ai-check.sh             # Pattern-based issue scanner
+├── config/                     # Tool configs
 │   ├── .clang-format
 │   └── .clang-tidy
-└── prompts/
-    ├── system-prompt.md
-    └── review-prompt.md
+├── prompts/                    # AI prompts
+│   ├── system-prompt.md
+│   └── review-prompt.md
+└── evals/                      # Skill routing tests
+    ├── positive-load-cases.md
+    ├── negative-load-cases.md
+    ├── adjacent-skill-confusions.md
+    └── hero-queries.md
 ```
 
----
+## Quick Start
 
-# What Each File Does
-
-## CLAUDE.md
-
-The shortest and most important rule summary.
-
-Purpose:
-- loaded into AI context
-- controls generation behavior
-- reduces randomness
-
-Think of it as:
-- engineering constitution
-- coding contract
-- AI behavior limiter
-
-This file should stay SHORT.
-
-Recommended:
-- 20~80 lines
-- only high-value constraints
-
----
-
-## docs/rules/
-
-Detailed engineering rules.
-
-Split by domain:
-- ownership
-- concurrency
-- API design
-- error handling
-- forbidden patterns
-
-Purpose:
-- readable by humans
-- referenced by AI
-- expandable over time
-
-These files are intentionally longer than CLAUDE.md.
-
----
-
-## config/.clang-format
-
-Automatic code formatting rules.
-
-Purpose:
-- consistent style
-- lower diff noise
-- easier reviews
-
-Usage:
+### Copy into your project
 
 ```bash
-clang-format -i file.cpp
+cp -r SKILL.md CLAUDE.md GOTCHAS.md references/ scripts/ assets/ hooks/ config/ prompts/ /your/project/
 ```
 
----
+### Configure your AI tool
 
-## config/.clang-tidy
+**Claude Code**: Point to `CLAUDE.md` + `SKILL.md`.
 
-Static analysis configuration.
+**Cursor**: Create `.cursor/rules/cpp.mdc` referencing `SKILL.md` and `references/`.
 
-Purpose:
-- detect dangerous patterns
-- enforce modern C++
-- reduce bugs
+**OpenClaw**: Inject `SKILL.md` + `prompts/system-prompt.md` into system context.
 
-Checks include:
-- cppcoreguidelines
-- modernize
-- performance
-- concurrency
-- bugprone
-
-Usage:
+### Run tooling
 
 ```bash
-clang-tidy file.cpp --config-file=config/.clang-tidy -- -std=c++20
+python3 scripts/detect_cpp_project.py
+python3 scripts/find_compile_commands.py
+python3 scripts/run_clang_tidy.py
 ```
 
----
+## Progressive Loading
 
-## hooks/
+Not all rules apply to all projects. `SKILL.md` instructs the agent to conditionally load:
 
-Automation scripts.
-
-Purpose:
-- automatically run checks
-- reduce human review burden
-- create feedback loop for AI
-
-### pre-commit.sh
-
-Runs:
-- clang-format
-- clang-tidy
-
-### ai-check.sh
-
-Scans all cpp/hpp files.
-
-Usage:
-
-```bash
-chmod +x hooks/*.sh
-./hooks/pre-commit.sh
-```
-
----
-
-## prompts/
-
-Reusable prompts for AI agents.
-
-### system-prompt.md
-
-Defines:
-- coding style
-- generation constraints
-- engineering priorities
-
-### review-prompt.md
-
-Defines:
-- review checklist
-- architecture review logic
-- ownership/concurrency checks
-
----
-
-# Recommended Workflow
-
-## Step 1 — Copy Files Into Your Project
-
-Copy:
-
-```text
-CLAUDE.md
-docs/rules/
-config/
-hooks/
-```
-
-Into your repository root.
-
-Example:
-
-```text
-my-project/
-├── CLAUDE.md
-├── src/
-├── docs/
-├── config/
-└── hooks/
-```
-
----
-
-# Step 2 — Configure Your AI Coding Tool
-
-## Claude Code
-
-Tell Claude:
-
-```text
-Follow CLAUDE.md and docs/rules/*.md.
-```
-
----
-
-## Cursor
-
-Create:
-
-```text
-.cursor/rules/cpp.mdc
-```
-
-Reference:
-- CLAUDE.md
-- docs/rules/
-
----
-
-## OpenCode / OpenClaw
-
-Inject:
-- CLAUDE.md
-- prompts/system-prompt.md
-
-Into system context.
-
----
-
-# Step 3 — Install Toolchain
-
-Linux/macOS:
-
-```bash
-sudo apt install clang-format clang-tidy
-```
-
-or:
-
-```bash
-brew install llvm
-```
-
-Verify:
-
-```bash
-clang-format --version
-clang-tidy --version
-```
-
----
-
-# Step 4 — Run Hooks
-
-```bash
-chmod +x hooks/*.sh
-./hooks/pre-commit.sh
-```
-
-Pipeline:
-
-```text
-AI generates code
-↓
-clang-format
-↓
-clang-tidy
-↓
-build/tests
-↓
-AI fixes issues
-↓
-commit
-```
-
----
-
-# Recommended AI Workflow
-
-## Good Pattern
-
-```text
-spec
-↓
-architecture
-↓
-CLAUDE.md
-↓
-small task
-↓
-AI generates
-↓
-checks
-↓
-review
-```
-
----
-
-## Bad Pattern
-
-```text
-huge vague prompt
-↓
-AI writes 5000 lines
-↓
-no checks
-↓
-architecture chaos
-```
-
----
-
-# Important Design Principle
-
-Do NOT put entire C++ Core Guidelines into context.
-
-Too large.
-Too noisy.
-Too philosophical.
-
-Instead:
-
-```text
-CppCoreGuidelines
-↓
-select
-↓
-compress
-↓
-convert into engineering constraints
-↓
-AI-readable constitution
-```
-
----
-
-# Best Practice
-
-Use THREE layers:
-
-| Layer | Purpose |
+| Condition | Load |
 |---|---|
-| CLAUDE.md | short high-value constraints |
-| docs/rules | detailed engineering rules |
-| Original Guidelines | human reference only |
+| Multi-threaded code | `references/concurrency.md` |
+| Custom error handling | `references/error-handling.md` |
+| Template metaprogramming | `references/templates.md` |
+| Performance-critical paths | `references/performance.md` |
+| Ownership questions | `references/lifetime.md` |
 
----
+## Token Budget
 
-# Future Extensions
+| Layer | Content | Approximate Cost |
+|---|---|---|
+| Index | name + description | ~50 tokens |
+| Load | SKILL.md body | ~1,500 tokens |
+| Runtime | references, scripts, assets | ~0-8,000 tokens (on demand) |
 
-You can evolve this into:
+## Credits
 
-- embedded constitution
-- game-server constitution
-- async/coroutine constitution
-- qt constitution
-- low-latency constitution
-- distributed-system constitution
-- agent-neutral constitution
-
----
-
-# Final Thought
-
-The future of software engineering is not:
-
-"AI writes everything."
-
-It is:
-
-"Humans define constraints.
-AI operates inside them."
+- C++ Core Guidelines by Bjarne Stroustrup, Herb Sutter, et al.
+- [Perplexity: Designing, Refining, and Maintaining Agent Skills](https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity)
