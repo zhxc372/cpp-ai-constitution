@@ -2,9 +2,23 @@
 
 **English** | [中文](README_CN.md)
 
-A C++ code review behavior system for AI agents. Not a compressed textbook — a judgment engine.
+A tool-agnostic C++ constraint system for AI coding agents.
+
+Not a compressed textbook — a judgment engine.
 
 Inspired by C++ Core Guidelines and [Perplexity's Skill design methodology](https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity).
+
+**OpenCode-first, Agent-neutral, OpenClaw-compatible.**
+
+## Compatibility
+
+- OpenCode (primary)
+- Claude Code
+- Cursor
+- Codex CLI
+- Gemini CLI
+- OpenClaw
+- Any agent that supports rules/skills
 
 ## What This Is
 
@@ -121,6 +135,71 @@ Not all rules apply to all projects. `SKILL.md` instructs the agent to condition
 | Index | name + description | ~50 tokens |
 | Load | SKILL.md body | ~1,500 tokens |
 | Runtime | references, scripts, assets | ~0-8,000 tokens (on demand) |
+
+## Integration Modes
+
+### OpenCode (recommended)
+
+```bash
+cp AGENTS.md /your/project/AGENTS.md
+cp opencode.json.example /your/project/opencode.json
+cp -r .opencode/ /your/project/.opencode/
+```
+
+### Claude Code
+
+```bash
+cp CLAUDE.md /your/project/CLAUDE.md
+cp -r .claude/skills/ /your/project/.claude/skills/
+```
+
+### Generic AI Coding
+
+Copy `AGENTS.md` and selected `references/*.md` into your agent context.
+
+### OpenClaw
+
+Use `SKILL.md` and rule files as reusable project skills.
+
+## Multiple Skills
+
+This project includes three specialized skills:
+
+| Skill | Purpose |
+|---|---|
+| `cpp-core-review` | Code review, safety audit, AI output validation |
+| `cpp-modernize` | C++ migration, systematic modernization |
+| `cpp-debug-audit` | Crash debugging, memory errors, sanitizer-based auditing |
+
+And three agent roles:
+
+| Agent | Role |
+|---|---|
+| `cpp-reviewer` | Read-only strict reviewer |
+| `cpp-refactor-planner` | Creates safe modernization plans |
+| `cpp-safety-auditor` | Systematic safety audit with sanitizers |
+
+## Sync Script
+
+When maintaining multi-platform compatibility:
+
+```bash
+python3 scripts/sync_skill_targets.py
+```
+
+Syncs canonical `SKILL.md` to `.opencode/`, `.claude/`, `.agents/` directories.
+
+## clang-tidy Profiles
+
+| Profile | Use Case |
+|---|---|
+| `clang-tidy.minimal.yml` | CI baseline, low false-positive rate |
+| `clang-tidy.migration.yml` | Legacy project migration |
+| `clang-tidy.strict.yml` | New projects or strict review |
+
+```bash
+clang-tidy file.cpp --config-file=config/clang-tidy.minimal.yml -- -std=c++20
+```
 
 ## Credits
 

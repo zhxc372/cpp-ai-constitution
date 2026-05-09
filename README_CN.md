@@ -2,9 +2,23 @@
 
 [English](README.md) | **中文**
 
-面向AI Agent的C++代码审查行为系统。不是压缩版教材——是判断引擎。
+面向AI编程Agent的C++工具无关约束系统。
+
+不是压缩版教材——是判断引擎。
 
 灵感来自 C++ Core Guidelines 和 [Perplexity的Skill设计方法论](https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity)。
+
+**OpenCode优先，Agent中立，OpenClaw兼容。**
+
+## 兼容性
+
+- OpenCode（主要）
+- Claude Code
+- Cursor
+- Codex CLI
+- Gemini CLI
+- OpenClaw
+- 任何支持rules/skills的Agent
 
 ## 这是什么
 
@@ -30,92 +44,104 @@ AI可读的工程约束系统，帮助Agent：
 > 如果很容易解释，模型已经知道了。删掉它。
 > 陷阱才是特殊情况。它们是最高价值的内容。
 
-本项目遵循这些原则：
-
-- 跳过模型已经知道的东西
-- 聚焦AI失败模式（gotchas）
-- 渐进加载（不是一次全塞）
-- 工具检查优先于主观审查
-
 ## 目录结构
 
 ```text
 cpp-ai-constitution/
-├── SKILL.md                    # 根：路由、优先级、宪法
-├── CLAUDE.md                   # 精简规则摘要
+├── AGENTS.md                   # Agent中立主入口
+├── SKILL.md                    # 根Skill：路由、优先级、宪法
+├── CLAUDE.md                   # Claude Code精简摘要
 ├── GOTCHAS.md                  # AI在C++中的失败模式
+├── opencode.json.example       # OpenCode配置示例
 ├── references/                 # 详细规则（按需加载）
-│   ├── rule-map.md             # 什么情况读什么规则
-│   ├── lifetime.md             # 所有权和生命周期陷阱
-│   ├── resource-management.md  # RAII模式和陷阱
-│   ├── concurrency.md          # 线程安全规则
-│   ├── error-handling.md       # 异常和错误策略
-│   ├── interfaces.md           # API设计规则
-│   ├── classes.md              # 类设计规则
-│   ├── templates.md            # 模板和concepts规则
-│   └── performance.md          # 性能审查清单
+├── .opencode/skills/           # OpenCode技能（3个）
+├── .opencode/agents/           # OpenCode角色（3个）
+├── .claude/skills/             # Claude Code兼容
+├── .agents/skills/             # 通用Agent兼容
 ├── scripts/                    # 自动化脚本
-│   ├── detect_cpp_project.py   # 识别C++项目结构
-│   ├── find_compile_commands.py # 查找或生成compile_commands.json
-│   └── run_clang_tidy.py       # 运行clang-tidy并汇总结果
 ├── assets/                     # 模板
-│   ├── review-report-template.md  # 审查报告模板
-│   ├── refactor-plan-template.md  # 重构计划模板
-│   └── risk-levels.md             # 风险等级定义
 ├── hooks/                      # Git钩子
-│   ├── pre-commit.sh           # 格式化+静态分析
-│   └── ai-check.sh             # 基于模式的问题扫描
-├── config/                     # 工具配置
-│   ├── .clang-format           # 代码格式化规则
-│   └── .clang-tidy             # 静态分析配置
+├── config/                     # clang工具配置（3档）
 ├── prompts/                    # AI提示词
-│   ├── system-prompt.md        # 系统提示词
-│   └── review-prompt.md        # 审查提示词
 └── evals/                      # Skill路由测试
-    ├── positive-load-cases.md     # 应该加载的场景
-    ├── negative-load-cases.md     # 不应该加载的场景
-    ├── adjacent-skill-confusions.md # 邻近Skill混淆场景
-    └── hero-queries.md            # 关键测试用例
 ```
 
-## 快速开始
+## 集成方式
 
-### 复制到你的项目
+### OpenCode（推荐）
 
 ```bash
-cp -r SKILL.md CLAUDE.md GOTCHAS.md references/ scripts/ assets/ hooks/ config/ prompts/ /你的项目/
+cp AGENTS.md /你的项目/AGENTS.md
+cp opencode.json.example /你的项目/opencode.json
+cp -r .opencode/ /你的项目/.opencode/
 ```
 
-### 配置你的AI工具
-
-**Claude Code**：指向 `CLAUDE.md` + `SKILL.md`。
-
-**Cursor**：创建 `.cursor/rules/cpp.mdc`，引用 `SKILL.md` 和 `references/`。
-
-**OpenClaw**：将 `SKILL.md` + `prompts/system-prompt.md` 注入系统上下文。
-
-### 运行工具
+### Claude Code
 
 ```bash
-python3 scripts/detect_cpp_project.py
-python3 scripts/find_compile_commands.py
-python3 scripts/run_clang_tidy.py
+cp CLAUDE.md /你的项目/CLAUDE.md
+cp -r .claude/skills/ /你的项目/.claude/skills/
 ```
+
+### 通用AI编程
+
+复制 `AGENTS.md` 和需要的 `references/*.md` 到你的Agent上下文。
+
+### OpenClaw
+
+使用 `SKILL.md` 和规则文件作为可复用项目技能。
+
+## 多技能体系
+
+本项目包含3个专用技能：
+
+| 技能 | 用途 |
+|---|---|
+| `cpp-core-review` | 代码审查、安全审计、AI输出验证 |
+| `cpp-modernize` | C++迁移、系统性现代化 |
+| `cpp-debug-audit` | 崩溃调试、内存错误、sanitizer审计 |
+
+3个Agent角色：
+
+| 角色 | 职责 |
+|---|---|
+| `cpp-reviewer` | 只读严格审查 |
+| `cpp-refactor-planner` | 制定安全现代化计划 |
+| `cpp-safety-auditor` | 系统性安全审计 |
 
 ## 渐进加载
 
-不是所有规则都适用所有项目。`SKILL.md`指示Agent按需加载：
+不是所有规则都适用所有项目。按需加载：
 
 | 条件 | 读取 |
 |---|---|
+| 所有权/生命周期 | `references/lifetime.md` |
 | 多线程代码 | `references/concurrency.md` |
 | 自定义错误处理 | `references/error-handling.md` |
 | 模板元编程 | `references/templates.md` |
 | 性能关键路径 | `references/performance.md` |
-| 所有权问题 | `references/lifetime.md` |
-| API/接口设计 | `references/interfaces.md` |
-| 类层次设计 | `references/classes.md` |
-| 资源管理 | `references/resource-management.md` |
+
+## clang-tidy配置分档
+
+| 配置 | 用途 |
+|---|---|
+| `clang-tidy.minimal.yml` | CI基线，低误报 |
+| `clang-tidy.migration.yml` | 老项目迁移 |
+| `clang-tidy.strict.yml` | 新项目或严格审查 |
+
+```bash
+clang-tidy file.cpp --config-file=config/clang-tidy.minimal.yml -- -std=c++20
+```
+
+## 同步脚本
+
+维护多平台兼容时：
+
+```bash
+python3 scripts/sync_skill_targets.py
+```
+
+将源 `SKILL.md` 同步到 `.opencode/`、`.claude/`、`.agents/` 目录。
 
 ## Token预算
 
@@ -124,18 +150,6 @@ python3 scripts/run_clang_tidy.py
 | Index | name + description | ~50 tokens |
 | Load | SKILL.md正文 | ~1,500 tokens |
 | Runtime | references、scripts、assets | ~0-8,000 tokens（按需） |
-
-## 审查输出格式
-
-发现按严重度分类：
-
-- **UB/安全**：未定义行为、内存损坏、数据竞争
-- **所有权**：生命周期bug、资源泄漏、悬空引用
-- **正确性**：逻辑错误、API使用错误
-- **现代化**：现代C++机会、风格改进
-- **风格**：命名、格式、可读性
-
-只有可操作的评论。没有工程价值的风格挑剔不算。
 
 ## 致谢
 
