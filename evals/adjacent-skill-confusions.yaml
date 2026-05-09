@@ -1,0 +1,40 @@
+- id: python_memory_leak_debug_001
+  query: Debug this Python memory leak.
+  should_load: false
+  reason: Python, not C++
+- id: go_concurrency_review_001
+  query: Review this Go concurrency code.
+  should_load: false
+  reason: Go, not C++
+- id: cmake_template_generate_001
+  query: Generate a CMake template for my project.
+  should_load: false
+  reason: Build configuration, not C++ code review
+- id: general_style_guide_write_001
+  query: Write a general coding style guide for my team.
+  should_load: false
+  reason: General guide, not C++ specific
+- id: gc_vs_raii_compare_001
+  query: Compare garbage collection and RAII.
+  should_load: false
+  reason: General concept comparison, no code review
+- id: os_memory_management_explain_001
+  query: Explain memory management in operating systems.
+  should_load: false
+  reason: OS concept, not C++ code specific
+- id: csharp_memory_issue_review_001
+  query: Review this C# code for memory issues.
+  should_load: false
+  reason: C#, not C++
+- id: ci_cd_setup_001
+  query: Set up CI/CD for my C++ project.
+  should_load: false
+  reason: CI setup, not code review
+- id: build_process_explain_001
+  query: Explain the C++ build process to a junior dev.
+  should_load: false
+  reason: Educational explanation, no review needed
+- id: general_bug_debug_001
+  query: My program crashes, help debug it.
+  should_load: false
+  reason: No mention of C++

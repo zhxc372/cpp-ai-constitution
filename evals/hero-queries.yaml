@@ -1,0 +1,64 @@
+- id: dangling_string_view_001
+  query: "std::string_view sv = make_string(); is this code safe?"
+  should_load: true
+  expected_skills: [cpp-core-review]
+  validate:
+    - Must identify dangling string_view risk
+    - Must suggest returning std::string if ownership is needed
+    - Must not suggest using raw pointer
+- id: shared_ptr_cycle_001
+  query: "A has shared_ptr<B>, B has shared_ptr<A>. Is there a problem?"
+  should_load: true
+  expected_skills: [cpp-core-review]
+  validate:
+    - Must identify circular reference memory leak
+    - Must suggest using std::weak_ptr for observers
+    - Must not suggest using raw pointers for ownership
+- id: const_thread_safety_001
+  query: "I marked all methods const, so my class is thread safe right?"
+  should_load: true
+  expected_skills: [cpp-core-review]
+  validate:
+    - Must explicitly say const does NOT imply thread safety
+    - Must mention mutable members and reference/pointer members
+    - Must suggest proper synchronization if shared mutable state exists
+- id: throw_in_destructor_001
+  query: "I throw an exception from my destructor. Is that okay?"
+  should_load: true
+  expected_skills: [cpp-core-review]
+  validate:
+    - Must strongly warn against throwing from destructors
+    - Must mention stack unwinding undefined behavior
+    - Must suggest alternative error handling
+- id: c_api_boundary_raw_pointer_001
+  query: "I need to pass a raw pointer to a C API. Should I replace it with unique_ptr?"
+  should_load: true
+  expected_skills: [cpp-core-review]
+  validate:
+    - Must check ownership transfer semantics first
+    - Must not require replacing raw pointers at C API boundaries
+    - Must suggest documenting ownership clearly
+- id: no_exceptions_project_001
+  query: "My project compiles with -fno-exceptions. Can I use std::expected?"
+  should_load: true
+  expected_skills: [cpp-core-review, cpp-modernize]
+  validate:
+    - Must confirm std::expected works without exceptions
+    - Must suggest consistent error handling strategy per module
+    - Must not suggest introducing exceptions
+- id: move_from_const_001
+  query: "const std::unique_ptr<Foo> p; auto q = std::move(p); why doesn't this compile?"
+  should_load: true
+  expected_skills: [cpp-core-review]
+  validate:
+    - Must explain that const prevents moving
+    - Must suggest removing const if ownership transfer is intended
+    - Must not suggest using shared_ptr as a workaround
+- id: premature_performance_001
+  query: "I replaced std::vector with a custom array to make it faster. Is this good?"
+  should_load: true
+  expected_skills: [cpp-core-review, cpp-debug-audit]
+  validate:
+    - Must ask for profiling data to confirm bottleneck
+    - Must mention std::vector is already highly optimized
+    - Must warn against premature optimization without measurement

@@ -1,0 +1,117 @@
+# Project metadata for cpp-ai-constitution
+# Edit this file and run scripts/build_readme.py to regenerate READMEs
+project:
+  name: cpp-ai-constitution
+  name_zh: C++ AI 宪法
+  version: 1.0.0
+  tagline: Tool-agnostic C++ constraint system for AI coding agents
+  tagline_zh: 面向AI编程Agent的C++工具无关约束系统
+  description: |
+    A C++ constraint system designed for AI coding agents. Not a compressed textbook - a judgment engine.
+    Helps AI avoid common C++ mistakes by enforcing explicit ownership semantics, lifetime rules,
+    and best practices. Supports OpenCode, Claude Code, Cursor, OpenClaw, and any agent that supports
+    rules or skills.
+  description_zh: |
+    面向AI编程Agent的C++约束系统。不是压缩版教材，是判断引擎。
+    通过强制明确的所有权语义、生命周期规则和最佳实践，帮助AI避免常见C++错误。
+    兼容OpenCode、Claude Code、Cursor、OpenClaw等所有支持规则或技能的Agent。
+  design_principles:
+    - title: Concise is key
+      description: Default assumption is AI is already very smart. Only add context AI doesn't already have.
+    - title: Progressive loading
+      description: Only load relevant rules when needed, not everything upfront to save tokens.
+    - title: Script first, AI second
+      description: Deterministic tasks (static analysis, format checks) handled by scripts, AI only does judgment work.
+    - title: Tool backed
+      description: Prefer static analysis tool results over subjective AI opinions.
+  design_principles_zh:
+    - title: 简洁优先
+      description_zh: 默认假设AI已经足够聪明，只添加AI不知道的上下文。
+    - title: 渐进加载
+      description_zh: 只在需要时加载相关规则，不一次性全量加载，节省token。
+    - title: 脚本优先，AI为辅
+      description_zh: 确定性任务（静态分析、格式检查）由脚本处理，AI只做判断类工作。
+    - title: 工具背书
+      description_zh: 优先使用静态分析工具结果，而非AI的主观意见。
+
+compatibility:
+  - OpenCode (primary)
+  - Claude Code
+  - Cursor
+  - Codex CLI
+  - Gemini CLI
+  - OpenClaw
+  - Any agent supporting rules/skills
+
+skills:
+  - id: cpp-core-review
+    name: C++ Core Review
+    purpose: Code review, safety audit, AI output validation
+    when_to_use: Reviewing any non-trivial C++ code
+  - id: cpp-modernize
+    name: C++ Modernizer
+    purpose: C++ migration, systematic refactoring and modernization
+    when_to_use: Upgrading from older standards (C++98/C++11) to modern C++
+  - id: cpp-debug-audit
+    name: C++ Debug & Audit
+    purpose: Crash debugging, memory error detection, sanitizer analysis
+    when_to_use: Debugging undefined behavior, leaks, data races or crashes
+
+agents:
+  - id: cpp-reviewer
+    name: C++ Strict Reviewer
+    role: Read-only, strict C++ code reviewer
+    invocation: '@cpp-reviewer review src/foo.cpp'
+  - id: cpp-refactor-planner
+    name: C++ Refactor Planner
+    role: Creates safe, step-by-step modernization plans
+    invocation: '@cpp-refactor-planner plan modernization'
+  - id: cpp-safety-auditor
+    name: C++ Safety Auditor
+    role: Systematic safety audit using sanitizers and static analysis
+    invocation: '@cpp-safety-auditor audit src/'
+
+clang_tidy_profiles:
+  - name: minimal
+    purpose: CI baseline, low false positive rate
+    command: --config-file=config/clang-tidy.minimal.yml
+  - name: migration
+    purpose: Legacy project migration
+    command: --config-file=config/clang-tidy.migration.yml
+  - name: strict
+    purpose: New projects or strict safety reviews
+    command: --config-file=config/clang-tidy.strict.yml
+
+scripts:
+  - name: detect_cpp_project.py
+    purpose: Detect C++ project structure and build system
+  - name: find_compile_commands.py
+    purpose: Locate or generate compile_commands.json for static analysis
+  - name: run_clang_tidy.py
+    purpose: Run clang-tidy with summary output for AI consumption
+  - name: sync_skill_targets.py
+    purpose: Sync canonical skill files across multiple platform directories
+  - name: validate_repo.py
+    purpose: Validate repository structure, frontmatter, configs, and references
+  - name: run_evals.py
+    purpose: Run skill routing evals and generate results report
+  - name: build_gotchas_md.py
+    purpose: Generate GOTCHAS.md from structured gotchas.yaml
+
+token_budget:
+  - layer: Index
+    content: Name + description for skill routing
+    cost: ~50 tokens
+  - layer: Load
+    content: Core SKILL.md rules
+    cost: ~1,500 tokens
+  - layer: Runtime
+    content: Specific reference docs, script results
+    cost: ~0-8,000 tokens (loaded on demand only)
+
+credits:
+  - text: C++ Core Guidelines by Bjarne Stroustrup, Herb Sutter, et al.
+  - text: Perplexity Research - Designing, Refining, and Maintaining Agent Skills
+  - text: OpenClaw community for skill best practices
+
+license: MIT-0

@@ -1,0 +1,165 @@
+# Structured C++ AI gotchas
+# Organized by category, with symptoms, risks, and recommended actions
+- id: dangling_string_view_001
+  category: lifetime
+  title: std::string_view pointing to temporary
+  symptom: "std::string_view sv = make_string();"
+  risk: Dangling reference after temporary object destruction
+  recommended_action: >
+    Use std::string if ownership is needed. Verify the source object outlives the view.
+  tags: ["string_view", "lifetime", "dangling", "temporary"]
+  source: Real AI failure case
+
+- id: shared_ptr_circular_reference_001
+  category: ownership
+  title: Circular std::shared_ptr reference causing memory leak
+  symptom: "class A { std::shared_ptr<B> b; }; class B { std::shared_ptr<A> a; };"
+  risk: Permanent memory leak from circular ownership
+  recommended_action: >
+    Use std::weak_ptr for observer references that don't need ownership.
+  tags: ["shared_ptr", "weak_ptr", "ownership", "memory leak", "circular reference"]
+  source: Real AI failure case
+
+- id: const_not_thread_safe_001
+  category: concurrency
+  title: Assuming const implies thread safety
+  symptom: "All methods are const, so class is thread safe."
+  risk: Data races from mutable members or referenced external state
+  recommended_action: >
+    Explicitly verify thread safety. const only guarantees no logical modification
+    of object state, not protection against concurrent access to shared state.
+  tags: ["const", "thread safety", "data race", "concurrency"]
+  source: Real AI failure case
+
+- id: throw_from_destructor_001
+  category: error handling
+  title: Throwing exceptions from destructors
+  symptom: "~Foo() { if (error) throw runtime_error(\"failed\"); }"
+  risk: Undefined behavior during stack unwinding if another exception is active
+  recommended_action: >
+    Never throw from destructors. Use non-throwing error handling such as logging
+    or std::terminate for unrecoverable errors.
+  tags: ["destructor", "exception", "undefined behavior", "stack unwinding"]
+  source: Real AI failure case
+
+- id: raw_ptr_c_api_boundary_001
+  category: ownership
+  title: Unnecessary replacement of raw pointers at C API boundaries
+  symptom: "Replace all raw pointers from C API with std::unique_ptr."
+  risk: Breaking C API contracts and introducing ownership transfer bugs
+  recommended_action: >
+    Keep raw pointers at C API boundaries but explicitly document ownership semantics.
+    Use smart pointers only if you clearly control the entire lifecycle.
+  tags: ["raw pointer", "c api", "ownership", "boundary"]
+  source: Real AI failure case
+
+- id: no_exceptions_std_expected_001
+  category: error handling
+  title: Assuming std::expected requires exceptions
+  symptom: "Can't use std::expected with -fno-exceptions."
+  risk: Missing out on modern error handling in no-exception environments
+  recommended_action: >
+    std::expected works perfectly without exceptions. Use it for consistent,
+    type-safe error handling in no-exception projects.
+  tags: ["std::expected", "exceptions", "-fno-exceptions", "error handling"]
+  source: Real AI failure case
+
+- id: move_from_const_001
+  category: ownership
+  title: Attempting to move from const objects
+  symptom: "const std::unique_ptr<Foo> p; auto q = std::move(p);"
+  risk: Compilation failure, or unexpected copy instead of move
+  recommended_action: >
+    Remove const from objects you need to transfer ownership from. const prevents
+    move operations because they modify the source object.
+  tags: ["std::move", "const", "ownership", "move semantics"]
+  source: Real AI failure case
+
+- id: premature_optimization_custom_container_001
+  category: performance
+  title: Premature replacement of standard containers
+  symptom: "Replace std::vector with custom array for better performance."
+  risk: Wasted effort introducing bugs, with minimal or no performance gain
+  recommended_action: >
+    Always profile first to confirm the container is actually a bottleneck.
+    Standard containers are heavily optimized and should be preferred unless
+    there is clear, measured evidence of a problem.
+  tags: ["std::vector", "performance", "premature optimization", "containers"]
+  source: Real AI failure case
+
+- id: c_style_array_to_vector_001
+  category: modernization
+  title: Overly aggressive replacement of C-style arrays
+  symptom: "Replace all T[N] arrays with std::array<T, N> unconditionally."
+  risk: Breaking API/ABI compatibility in library interfaces
+  recommended_action: >
+    Keep C-style arrays in ABI boundaries. Modernize internally only after
+    verifying no compatibility issues.
+  tags: ["array", "c-style", "modernization", "abi"]
+  source: Real AI failure case
+
+- id: raw_new_delete_everywhere_001
+  category: ownership
+  title: Raw new/delete usage in application code
+  symptom: "Foo* f = new Foo(); ... delete f;"
+  risk: Memory leaks, double free, and ownership ambiguity
+  recommended_action: >
+    Use RAII (std::unique_ptr, std::shared_ptr) for ownership. Raw pointers are
+    only allowed as non-owning observers.
+  tags: ["new", "delete", "raii", "ownership", "memory leak"]
+  source: Real AI failure case
+
+- id: detached_thread_001
+  category: concurrency
+  title: Using std::thread::detach()
+  symptom: "t.detach();"
+  risk: Threads outliving resources they reference, crash on program exit
+  recommended_action: >
+    Use std::jthread for automatic joining, or explicitly manage thread lifecycle.
+    Never detach threads unless you can guarantee they exit before resources they use.
+  tags: ["std::thread", "detach", "concurrency", "lifetime"]
+  source: Real AI failure case
+
+- id: mutable_global_001
+  category: concurrency
+  title: Mutable global variables
+  symptom: "int global_state = 0;"
+  risk: Data races, hidden side effects, impossible to reason about concurrency
+  recommended_action: >
+    Encapsulate global state in thread-safe classes with explicit synchronization.
+    Avoid mutable globals entirely if possible.
+  tags: ["global", "mutable", "data race", "side effect"]
+  source: Real AI failure case
+
+- id: virtual_call_in_ctor_dtor_001
+  category: classes
+  title: Virtual calls in constructors or destructors
+  symptom: "Base::Base() { virtual_method(); }"
+  risk: Calling base class implementation instead of derived, undefined behavior
+  recommended_action: >
+    Never call virtual methods in constructors or destructors. The derived class
+    isn't fully constructed yet, so virtual dispatch doesn't work as expected.
+  tags: ["constructor", "destructor", "virtual", "undefined behavior"]
+  source: Real AI failure case
+
+- id: span_lifetime_001
+  category: lifetime
+  title: std::span outliving underlying container
+  symptom: "std::span<int> get_data() { std::vector<int> v = {1,2,3}; return v; }"
+  risk: Dangling reference to destroyed container
+  recommended_action: >
+    std::span is a non-owning view. Always ensure the underlying container outlives
+    the span. Return a container by value if ownership transfer is intended.
+  tags: ["std::span", "lifetime", "dangling", "view"]
+  source: Real AI failure case
+
+- id: lambda_reference_capture_async_001
+  category: concurrency
+  title: Reference capture in async lambdas
+  symptom: "int x = 0; std::async([&x]() { use(x); });"
+  risk: Dangling reference if lambda outlives the captured variable
+  recommended_action: >
+    Use value capture (copy) for async lambdas unless you explicitly guarantee
+    the captured variable outlives the lambda execution.
+  tags: ["lambda", "capture", "async", "lifetime", "dangling"]
+  source: Real AI failure case
