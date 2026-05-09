@@ -1,1 +1,10 @@
 __pycache__/
+*.pyc
+*.pyo
+build/
+cmake-build-*/
+node_modules/
+.DS_Store
+*.swp
+*.swo
+*~
