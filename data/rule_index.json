@@ -147,15 +147,15 @@
         "index"
       ],
       "keywords": [
-        "apply",
-        "delete",
+        "exception",
+        "policy",
         "map",
         "conditionally",
-        "policy",
-        "exception",
-        "always",
+        "new",
+        "delete",
         "rule",
-        "new"
+        "always",
+        "apply"
       ],
       "path": "references/rule-map.md"
     },
@@ -168,28 +168,28 @@
         "pointers"
       ],
       "keywords": [
-        "lifetime",
-        "semantics",
-        "const",
-        "pointer",
-        "hazards",
-        "traps",
+        "this",
         "ownership",
-        "weak_ptr",
-        "shared_ptr",
-        "dangling",
-        "classification",
-        "unique_ptr",
-        "span",
-        "and",
-        "transfer",
-        "move",
-        "owning",
-        "string_view",
-        "references",
-        "enable_shared_from_this",
+        "semantics",
+        "lifetime",
         "patterns",
-        "this"
+        "const",
+        "weak_ptr",
+        "transfer",
+        "hazards",
+        "and",
+        "classification",
+        "move",
+        "shared_ptr",
+        "enable_shared_from_this",
+        "owning",
+        "dangling",
+        "unique_ptr",
+        "string_view",
+        "pointer",
+        "references",
+        "traps",
+        "span"
       ],
       "path": "references/lifetime.md"
     },
@@ -202,18 +202,18 @@
         "memory"
       ],
       "keywords": [
-        "mistakes",
-        "rules",
-        "custom",
-        "stack",
-        "raii",
-        "management",
-        "shared_ptr",
-        "common",
-        "heap",
-        "deleters",
         "vs",
-        "resource"
+        "common",
+        "management",
+        "resource",
+        "custom",
+        "shared_ptr",
+        "raii",
+        "heap",
+        "mistakes",
+        "deleters",
+        "rules",
+        "stack"
       ],
       "path": "references/resource-management.md"
     },
@@ -227,26 +227,26 @@
         "thread safety"
       ],
       "keywords": [
-        "jthread",
-        "stop_source",
-        "latch",
-        "mutex",
+        "this",
+        "ai",
+        "avoid",
+        "patterns",
+        "call_once",
         "const",
-        "prefer",
+        "concurrency",
+        "atomic",
+        "shared_mutex",
+        "latch",
         "mistakes",
+        "jthread",
         "thread",
         "volatile",
-        "ai",
-        "shared_mutex",
-        "atomic",
-        "common",
-        "concurrency",
-        "avoid",
-        "call_once",
-        "rules",
+        "stop_source",
         "lock_guard",
-        "patterns",
-        "this"
+        "mutex",
+        "common",
+        "prefer",
+        "rules"
       ],
       "path": "references/concurrency.md"
     },
@@ -260,25 +260,25 @@
         "noexcept"
       ],
       "keywords": [
+        "exception",
+        "error",
+        "ai",
+        "strategy",
         "noexcept",
         "handling",
-        "levels",
+        "safety",
+        "and",
         "throw",
+        "selection",
+        "error_code",
         "basic",
         "mistakes",
-        "ai",
-        "safety",
-        "strong",
-        "strategy",
-        "and",
-        "common",
-        "error_code",
-        "exception",
-        "selection",
         "errno",
-        "rules",
         "exceptions",
-        "error"
+        "strong",
+        "levels",
+        "common",
+        "rules"
       ],
       "path": "references/error-handling.md"
     },
@@ -293,20 +293,20 @@
         "ABI"
       ],
       "keywords": [
+        "interfaces",
+        "common",
+        "design",
+        "api",
+        "ai",
         "mistakes",
-        "rules",
+        "explicit",
         "string_view",
         "noexcept",
-        "const",
-        "span",
-        "design",
-        "common",
-        "explicit",
-        "interfaces",
-        "ai",
-        "patterns",
         "boundary",
-        "api"
+        "patterns",
+        "const",
+        "rules",
+        "span"
       ],
       "path": "references/interfaces.md"
     },
@@ -320,16 +320,16 @@
         "object"
       ],
       "keywords": [
-        "mistakes",
-        "rules",
-        "classes",
-        "polymorphic",
-        "common",
-        "ai",
-        "types",
-        "vs",
         "override",
-        "value"
+        "common",
+        "types",
+        "ai",
+        "classes",
+        "mistakes",
+        "value",
+        "rules",
+        "polymorphic",
+        "vs"
       ],
       "path": "references/classes.md"
     },
@@ -342,14 +342,14 @@
         "TMP"
       ],
       "keywords": [
-        "templates",
-        "mistakes",
-        "rules",
         "common",
+        "templates",
         "and",
+        "concepts",
         "ai",
+        "mistakes",
         "patterns",
-        "concepts"
+        "rules"
       ],
       "path": "references/templates.md"
     },
@@ -364,24 +364,24 @@
         "profile"
       ],
       "keywords": [
+        "perf",
+        "tools",
+        "common",
         "hot",
         "unordered_map",
-        "mistakes",
-        "rules",
+        "vector",
+        "instruments",
+        "function",
+        "checklist",
         "path",
+        "ai",
         "shared_ptr",
+        "measurement",
+        "mistakes",
+        "vtune",
         "performance",
         "any",
-        "instruments",
-        "common",
-        "ai",
-        "measurement",
-        "tools",
-        "vector",
-        "checklist",
-        "function",
-        "perf",
-        "vtune"
+        "rules"
       ],
       "path": "references/performance.md"
     }
@@ -413,70 +413,16 @@
     "unique_ptr": [
       "lifetime.md"
     ],
-    "span": [
-      "lifetime.md",
-      "interfaces.md"
-    ],
-    "and": [
-      "lifetime.md",
-      "error-handling.md",
-      "templates.md"
-    ],
     "string_view": [
       "lifetime.md",
       "interfaces.md"
     ],
-    "patterns": [
+    "span": [
       "lifetime.md",
-      "concurrency.md",
-      "interfaces.md",
-      "templates.md"
-    ],
-    "this": [
-      "lifetime.md",
-      "concurrency.md"
-    ],
-    "mistakes": [
-      "resource-management.md",
-      "concurrency.md",
-      "error-handling.md",
-      "interfaces.md",
-      "classes.md",
-      "templates.md",
-      "performance.md"
-    ],
-    "rules": [
-      "resource-management.md",
-      "concurrency.md",
-      "error-handling.md",
-      "interfaces.md",
-      "classes.md",
-      "templates.md",
-      "performance.md"
+      "interfaces.md"
     ],
     "raii": [
       "resource-management.md"
-    ],
-    "common": [
-      "resource-management.md",
-      "concurrency.md",
-      "error-handling.md",
-      "interfaces.md",
-      "classes.md",
-      "templates.md",
-      "performance.md"
-    ],
-    "vs": [
-      "resource-management.md",
-      "classes.md"
-    ],
-    "ai": [
-      "concurrency.md",
-      "error-handling.md",
-      "interfaces.md",
-      "classes.md",
-      "templates.md",
-      "performance.md"
     ],
     "noexcept": [
       "error-handling.md",
@@ -486,7 +432,7 @@
   "metadata": {
     "total_files": 9,
     "total_categories": 46,
-    "total_keywords": 19,
+    "total_keywords": 11,
     "generated_by": "scripts/build_rule_index.py"
   }
 }

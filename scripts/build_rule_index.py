@@ -100,12 +100,34 @@ def build_index() -> Dict:
     
     # Only keep keywords that appear in at least 2 files (more discriminative)
     # Or very specific keywords regardless of frequency
+    # Filter out meaningless keywords
+    noise_keywords = {
+        "and", "this", "ai", "common", "mistakes", "rules", "patterns", "vs",
+        "do", "not", "the", "for", "that", "with", "are", "but", "also",
+        "can", "has", "its", "may", "use", "used", "using", "will",
+        "all", "any", "one", "two", "get", "set", "has", "new",
+        "code", "check", "time", "data", "type", "value", "make",
+        "before", "after", "during", "when", "where", "which", "what",
+        "more", "only", "very", "each", "per", "such", "other",
+        "see", "note", "add", "fix", "much", "many", "few",
+        "always", "never", "often", "sometimes", "usually",
+        "change", "changing", "changed", "changes",
+        "work", "working", "works",
+        "good", "bad", "better", "important",
+        "example", "examples",
+        "rules", "rule",
+        "version", "versions",
+        "must", "should", "need", "needs",
+    }
+    
     filtered_kw = {}
     prioritized_kws = {"dangling", "lifetime", "raii", "data race", "undefined behavior", 
                       "segfault", "memory leak", "shared_ptr", "unique_ptr", "weak_ptr",
                       "constexpr", "noexcept", "virtual", "std::expected", "abi"}
     
     for kw, files in keyword_map.items():
+        if kw in noise_keywords:
+            continue
         if kw in prioritized_kws or len(files) >= 2:
             filtered_kw[kw] = files
     

@@ -128,19 +128,20 @@ def generate_markdown(groups: Dict[str, List[Dict]]) -> str:
 
 ## 📊 Stats
 Total gotchas: {sum(len(items) for items in groups.values())}
-Last updated: $(date -I)
+Last updated: {{ generated_date }}
 """
     return md
 
 def main() -> int:
     """Main function."""
+    from datetime import datetime
     gotchas = load_gotchas()
     if not gotchas:
         print("❌ No gotchas loaded", file=sys.stderr)
         return 1
     
     groups = group_by_category(gotchas)
-    markdown = generate_markdown(groups)
+    markdown = generate_markdown(groups).replace("{{ generated_date }}", datetime.now().strftime("%Y-%m-%d"))
     
     with open(OUTPUT_MD, 'w', encoding='utf-8') as f:
         f.write(markdown)

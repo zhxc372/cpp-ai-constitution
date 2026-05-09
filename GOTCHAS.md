@@ -299,4 +299,4 @@ Replace all T[N] arrays with std::array<T, N> unconditionally.
 
 ## 📊 Stats
 Total gotchas: 15
-Last updated: $(date -I)
+Last updated: { generated_date }

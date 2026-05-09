@@ -13,5 +13,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install pyyaml
+      - run: pip install pyyaml jinja2
       - run: python scripts/validate_repo.py
+      - run: python scripts/run_evals.py
+      - run: python scripts/check_rule_conflicts.py
+      - run: python scripts/build_rule_index.py
+      - run: python scripts/build_readme.py
+      - run: python -m py_compile scripts/*.py
