@@ -55,17 +55,51 @@ cpp-ai-constitution/
 │   ├── templates.md            # 模板和concepts规则
 │   └── performance.md          # 性能审查清单
 ├── scripts/                    # 自动化脚本
+│   ├── detect_cpp_project.py   # 识别C++项目结构
+│   ├── find_compile_commands.py # 查找或生成compile_commands.json
+│   └── run_clang_tidy.py       # 运行clang-tidy并汇总结果
 ├── assets/                     # 模板
+│   ├── review-report-template.md  # 审查报告模板
+│   ├── refactor-plan-template.md  # 重构计划模板
+│   └── risk-levels.md             # 风险等级定义
 ├── hooks/                      # Git钩子
+│   ├── pre-commit.sh           # 格式化+静态分析
+│   └── ai-check.sh             # 基于模式的问题扫描
 ├── config/                     # 工具配置
+│   ├── .clang-format           # 代码格式化规则
+│   └── .clang-tidy             # 静态分析配置
 ├── prompts/                    # AI提示词
+│   ├── system-prompt.md        # 系统提示词
+│   └── review-prompt.md        # 审查提示词
 └── evals/                      # Skill路由测试
+    ├── positive-load-cases.md     # 应该加载的场景
+    ├── negative-load-cases.md     # 不应该加载的场景
+    ├── adjacent-skill-confusions.md # 邻近Skill混淆场景
+    └── hero-queries.md            # 关键测试用例
 ```
 
 ## 快速开始
 
+### 复制到你的项目
+
 ```bash
 cp -r SKILL.md CLAUDE.md GOTCHAS.md references/ scripts/ assets/ hooks/ config/ prompts/ /你的项目/
+```
+
+### 配置你的AI工具
+
+**Claude Code**：指向 `CLAUDE.md` + `SKILL.md`。
+
+**Cursor**：创建 `.cursor/rules/cpp.mdc`，引用 `SKILL.md` 和 `references/`。
+
+**OpenClaw**：将 `SKILL.md` + `prompts/system-prompt.md` 注入系统上下文。
+
+### 运行工具
+
+```bash
+python3 scripts/detect_cpp_project.py
+python3 scripts/find_compile_commands.py
+python3 scripts/run_clang_tidy.py
 ```
 
 ## 渐进加载
@@ -79,6 +113,29 @@ cp -r SKILL.md CLAUDE.md GOTCHAS.md references/ scripts/ assets/ hooks/ config/ 
 | 模板元编程 | `references/templates.md` |
 | 性能关键路径 | `references/performance.md` |
 | 所有权问题 | `references/lifetime.md` |
+| API/接口设计 | `references/interfaces.md` |
+| 类层次设计 | `references/classes.md` |
+| 资源管理 | `references/resource-management.md` |
+
+## Token预算
+
+| 层级 | 内容 | 大致成本 |
+|---|---|---|
+| Index | name + description | ~50 tokens |
+| Load | SKILL.md正文 | ~1,500 tokens |
+| Runtime | references、scripts、assets | ~0-8,000 tokens（按需） |
+
+## 审查输出格式
+
+发现按严重度分类：
+
+- **UB/安全**：未定义行为、内存损坏、数据竞争
+- **所有权**：生命周期bug、资源泄漏、悬空引用
+- **正确性**：逻辑错误、API使用错误
+- **现代化**：现代C++机会、风格改进
+- **风格**：命名、格式、可读性
+
+只有可操作的评论。没有工程价值的风格挑剔不算。
 
 ## 致谢
 
