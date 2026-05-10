@@ -251,7 +251,7 @@ cpp-ai-constitution/
 ├── config/                         # Tool configurations
 ├── prompts/                        # Reusable AI prompts
 ├── evals/                          # Skill routing tests
-├── templates/                      # Jinja2 templates for documentation generation
+├── templates/                      # Jinja2 templates + Phase 0 starter guide
 ├── .github/workflows/validate.yml  # CI validation
 └── LICENSE
 ```

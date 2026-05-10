@@ -75,6 +75,12 @@ Read `GOTCHAS.md` for AI failure patterns in C++.
 
 These come from real model mistakes, not from textbooks.
 
+## Getting Started
+
+To use this constitution in a real C++ project, see `templates/phase0-starter.md`.
+
+It provides a step-by-step guide and copy-paste prompt for starting a new project with AI constitution constraints.
+
 ## Output Format
 
 Categorize findings by severity:
