@@ -32,9 +32,9 @@ See [ADAPTER_MATRIX.md](ADAPTER_MATRIX.md) for full details.
 
 | Platform | Support Level | Auto-load | Verified |
 |----------|--------------|------------|----------|
-| OpenCode | Officially Supported | ✅ | ✅ validate_repo.py |
-| Claude Code | Supported | ✅ | ✅ validate_repo.py |
-| OpenClaw | Supported | ✅ | ✅ validate_repo.py |
+| OpenCode | Officially Supported | ✅ | ✅ Structure Verified |
+| Claude Code | Supported | ✅ | ✅ Structure Verified |
+| OpenClaw | Supported | ✅ | ✅ Structure Verified |
 | Cursor | Recipe Only | ⚠️ Manual | Manual only |
 | Codex CLI | Recipe Only | ⚠️ Manual | Manual only |
 | Gemini CLI | Recipe Only | ⚠️ Manual | Manual only |

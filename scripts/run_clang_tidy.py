@@ -3,7 +3,7 @@
 
 Usage:
   python3 scripts/run_clang_tidy.py --profile minimal
-  python3 scripts/run_clang_tidy.py --profile strict --compile-commands build/compile_commands.json
+  python3 scripts/run_clang_tidy.py --profile strict --build-dir build
   python3 scripts/run_clang_tidy.py --std c++23 --changed-only --format json
   python3 scripts/run_clang_tidy.py --fail-on error --output results.md
 """
@@ -37,7 +37,7 @@ def find_files(changed_only: bool = False) -> list[Path]:
         files.extend(root.glob(f"**/{ext}"))
 
     exclude = {".git", "build", "cmake-build-", "node_modules", "__pycache__", "third_party", "vendor"}
-    files = [f for f in files if not any(e in f.parts for e in exclude)]
+    files = [f for f in files if not any(e in str(f) for e in exclude)]
 
     if changed_only:
         try:
@@ -56,14 +56,14 @@ def find_files(changed_only: bool = False) -> list[Path]:
 def run_clang_tidy(
     filepath: str | Path,
     config_file: str,
-    compile_commands: str | None = None,
+    build_dir: str | None = None,
     std: str = "c++20",
 ) -> dict:
     """Run clang-tidy on a single file and return structured result."""
     cmd = ["clang-tidy", str(filepath), "--config-file", config_file]
 
-    if compile_commands:
-        cmd.extend(["-p", compile_commands])
+    if build_dir:
+        cmd.extend(["-p", build_dir])
 
     cmd.extend(["--", f"-std={std}"])
 
@@ -146,8 +146,10 @@ def main() -> int:
     parser.add_argument("--profile", choices=list(PROFILES.keys()),
                         help="Preset profile: minimal, migration, strict")
     parser.add_argument("--config-file", help="Custom config file path")
-    parser.add_argument("--compile-commands", "-p",
-                        help="Path to compile_commands.json directory")
+    parser.add_argument("--build-dir", "-b",
+                        help="Path to build directory containing compile_commands.json")
+    parser.add_argument("--compile-commands", hidden=True, dest="build_dir",
+                        help="Deprecated: use --build-dir instead")
     parser.add_argument("--std", choices=STD_OPTIONS, default="c++20",
                         help="C++ standard (default: c++20)")
     parser.add_argument("--changed-only", action="store_true",
@@ -180,7 +182,7 @@ def main() -> int:
         "profile": args.profile or "default",
         "config_file": config_file,
         "std": args.std,
-        "compile_commands": args.compile_commands,
+        "build_dir": args.build_dir,
         "file_count": len(files),
     }
 
@@ -197,7 +199,7 @@ def main() -> int:
         if args.format == "text":
             print(f"  Checking {f}...")
 
-        r = run_clang_tidy(f, config_file, args.compile_commands, args.std)
+        r = run_clang_tidy(f, config_file, args.build_dir, args.std)
         results.append(r)
 
         for d in r["diagnostics"]:
