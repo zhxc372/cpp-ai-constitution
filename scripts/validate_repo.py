@@ -11,6 +11,19 @@ ROOT = Path(__file__).parent.parent
 errors = []
 warnings = []
 
+ADAPTER_HEADER = "<!-- Adapter Notice: This file is not a source of truth. Follow PROJECT_CONSTITUTION.md and core references. -->"
+
+
+def add_adapter_header(text: str) -> str:
+    """Add adapter header after frontmatter."""
+    if ADAPTER_HEADER in text:
+        return text
+    if text.startswith("---"):
+        parts = text.split("---", 2)
+        if len(parts) >= 3:
+            return f"---{parts[1]}---\n{ADAPTER_HEADER}\n{parts[2]}"
+    return f"{ADAPTER_HEADER}\n\n{text}"
+
 
 def check_frontmatter(filepath, label=""):
     """Check YAML frontmatter in a markdown file."""
@@ -61,7 +74,7 @@ def check_file_exists(path, label=""):
 
 
 def check_sync_consistency():
-    """Check canonical SKILL.md matches platform copies."""
+    """Check canonical SKILL.md matches platform copies (after adding adapter header)."""
     canonical = ROOT / "SKILL.md"
     if not canonical.exists():
         return
@@ -71,7 +84,7 @@ def check_sync_consistency():
         ROOT / ".claude" / "skills" / "cpp-core-review" / "SKILL.md",
         ROOT / ".agents" / "skills" / "cpp-core-review" / "SKILL.md",
     ]
-    source = canonical.read_text()
+    source = add_adapter_header(canonical.read_text())
     for t in targets:
         if not t.exists():
             warnings.append(f"[WARN] {t.relative_to(ROOT)} does not exist")
@@ -154,6 +167,53 @@ def main():
     ]
     for f in essentials:
         check_file_exists(f)
+
+    # 9. Governance files
+    print("\n--- Governance Files ---")
+    gov_files = [
+        "PROJECT_CONSTITUTION.md",
+        "DECISION_RIGHTS.md",
+        "ADAPTER_POLICY.md",
+        "RULE_ADMISSION.md",
+        "evals/adapter-consistency.yaml",
+    ]
+    for f in gov_files:
+        check_file_exists(f)
+
+    # 10. Governance references in key files
+    print("\n--- Governance References ---")
+    gov_refs = {
+        "README.md": "PROJECT_CONSTITUTION.md",
+        "SKILL.md": "PROJECT_CONSTITUTION.md",
+        "AGENTS.md": "PROJECT_CONSTITUTION.md",
+    }
+    for f, kw in gov_refs.items():
+        path = ROOT / f
+        if path.exists():
+            text = path.read_text()
+            if kw in text:
+                print(f"[OK] {f} references {kw}")
+            else:
+                errors.append(f"[FAIL] {f} does not reference {kw}")
+        else:
+            errors.append(f"[FAIL] {f}: file not found")
+
+    # 11. Adapter header check
+    print("\n--- Adapter Headers ---")
+    adapter_files = list((ROOT / ".opencode" / "skills").rglob("SKILL.md"))
+    adapter_files += list((ROOT / ".opencode" / "agents").rglob("*.md"))
+    adapter_files += list((ROOT / ".claude" / "skills").rglob("SKILL.md"))
+    adapter_files += list((ROOT / ".agents" / "skills").rglob("SKILL.md"))
+    if (ROOT / "CLAUDE.md").exists():
+        adapter_files.append(ROOT / "CLAUDE.md")
+
+    header_marker = "Adapter Notice"
+    for af in adapter_files:
+        text = af.read_text()
+        if header_marker in text:
+            print(f"[OK] {af.relative_to(ROOT)} has adapter header")
+        else:
+            errors.append(f"[FAIL] {af.relative_to(ROOT)} missing adapter header")
 
     # Summary
     print("\n" + "=" * 50)

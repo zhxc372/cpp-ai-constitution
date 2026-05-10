@@ -2,6 +2,8 @@
 name: cpp-core-review
 description: Load when reviewing, refactoring, modernizing, debugging, or designing non-trivial C++ code where ownership, lifetime, RAII, concurrency, templates, interfaces, exceptions, or Core Guidelines compliance may affect correctness, safety, maintainability, or performance.
 ---
+<!-- Adapter Notice: This file is not a source of truth. Follow PROJECT_CONSTITUTION.md and core references. -->
+
 
 # C++ Core Review
 
@@ -95,3 +97,5 @@ Actionable comments only. No style nitpicks without engineering value.
 4. Prefer mechanical checks over subjective review.
 5. Never apply Core Guidelines mechanically without understanding context.
 6. Every new rule must come from: repeated model failure, known safety hazard, project constraint, eval failure, or tool-detectable issue.
+7. **PROJECT_CONSTITUTION.md is the highest constraint.** All adapters must follow ADAPTER_POLICY.md.
+8. AI may not self-approve rule changes. Human review required for all core changes.

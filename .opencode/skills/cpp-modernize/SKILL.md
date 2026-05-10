@@ -8,6 +8,8 @@ metadata:
   mode: refactor
   risk: behavior-preservation
 ---
+<!-- Adapter Notice: This file is not a source of truth. Follow PROJECT_CONSTITUTION.md and core references. -->
+
 
 # C++ Modernize Skill
 

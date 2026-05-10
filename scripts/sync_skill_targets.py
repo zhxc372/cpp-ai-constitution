@@ -14,22 +14,37 @@ TARGETS = [
 ]
 
 
+ADAPTER_HEADER = "<!-- Adapter Notice: This file is not a source of truth. Follow PROJECT_CONSTITUTION.md and core references. -->"
+
+
+def add_adapter_header(text: str) -> str:
+    """Add adapter header after frontmatter."""
+    if ADAPTER_HEADER in text:
+        return text
+    if text.startswith("---"):
+        parts = text.split("---", 2)
+        if len(parts) >= 3:
+            return f"---{parts[1]}---\n{ADAPTER_HEADER}\n{parts[2]}"
+    return f"{ADAPTER_HEADER}\n\n{text}"
+
+
 def sync():
     if not CANONICAL.exists():
         print(f"Canonical source not found: {CANONICAL}")
         return 1
 
     updated = 0
+    source_text = add_adapter_header(CANONICAL.read_text())
+
     for target in TARGETS:
         target.parent.mkdir(parents=True, exist_ok=True)
         if target.exists():
             existing = target.read_text()
-            source = CANONICAL.read_text()
-            if existing == source:
+            if existing == source_text:
                 print(f"  OK: {target.relative_to(ROOT)}")
                 continue
 
-        shutil.copy2(CANONICAL, target)
+        target.write_text(source_text)
         print(f"  SYNCED: {target.relative_to(ROOT)}")
         updated += 1
 

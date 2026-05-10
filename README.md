@@ -6,6 +6,10 @@ A tool-agnostic C++ constraint system for AI coding agents. Not a compressed tex
 
 **OpenCode-first, Agent-neutral, OpenClaw-compatible.**
 
+> ⚠️ 本项目受 [PROJECT_CONSTITUTION.md](PROJECT_CONSTITUTION.md) 最高约束。
+> 所有适配层必须遵守 [ADAPTER_POLICY.md](ADAPTER_POLICY.md)。
+> 规则准入遵循 [RULE_ADMISSION.md](RULE_ADMISSION.md)。
+
 Inspired by C++ Core Guidelines and [Perplexity's Skill design methodology](https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity).
 
 ## What This Is

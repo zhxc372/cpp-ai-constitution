@@ -8,6 +8,8 @@ metadata:
   mode: debug
   risk: safety-correctness
 ---
+<!-- Adapter Notice: This file is not a source of truth. Follow PROJECT_CONSTITUTION.md and core references. -->
+
 
 # C++ Debug & Audit Skill
 

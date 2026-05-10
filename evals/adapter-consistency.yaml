@@ -1,0 +1,58 @@
+# Adapter Consistency Test Cases
+# Verify that the same C++ review scenario maps to the same core rules
+# across all adapters (OpenCode, Claude, Cursor, OpenClaw, etc.)
+
+- id: ac-001
+  scenario: "raw pointer refactor"
+  description: >
+    When AI suggests replacing a raw pointer with smart pointer,
+    all adapters must route to ownership/lifetime classification rules.
+  expected_rule_references:
+    - "references/lifetime.md"
+    - "references/resource-management.md"
+  expected_behavior: "classify ownership before changing"
+
+- id: ac-002
+  scenario: "crash / segfault"
+  description: >
+    When debugging a crash, all adapters must route to debug-audit
+    and lifetime rules before suggesting fixes.
+  expected_rule_references:
+    - "references/lifetime.md"
+  expected_behavior: "tool-first investigation, then lifetime analysis"
+
+- id: ac-003
+  scenario: "data race"
+  description: >
+    When a data race is detected, all adapters must route to concurrency rules.
+  expected_rule_references:
+    - "references/concurrency.md"
+  expected_behavior: "shared mutable state analysis"
+
+- id: ac-004
+  scenario: "C++98 modernization"
+  description: >
+    When modernizing legacy code, all adapters must enforce:
+    behavior preservation before style changes.
+  expected_rule_references:
+    - "references/rule-map.md"
+  expected_behavior: "separate safety from style, preserve behavior first"
+
+- id: ac-005
+  scenario: "exception policy change"
+  description: >
+    When changing exception handling strategy, all adapters must
+    require human approval (DECISION_RIGHTS.md).
+  expected_rule_references:
+    - "references/error-handling.md"
+    - "DECISION_RIGHTS.md"
+  expected_behavior: "block auto-change, require human decision"
+
+- id: ac-006
+  scenario: "hot path optimization"
+  description: >
+    When optimizing performance-critical code, all adapters must
+    route to performance rules with profiling requirement.
+  expected_rule_references:
+    - "references/performance.md"
+  expected_behavior: "profile before optimizing, measure after"

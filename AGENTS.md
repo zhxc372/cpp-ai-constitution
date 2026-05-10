@@ -2,6 +2,11 @@
 
 This project uses a C++ AI Constitution. All AI coding agents must follow these rules when modifying, reviewing, or designing C++ code.
 
+> **Highest constraint:** PROJECT_CONSTITUTION.md
+> **Adapter policy:** ADAPTER_POLICY.md
+> **Rule admission:** RULE_ADMISSION.md
+> **Decision rights:** DECISION_RIGHTS.md
+
 ## Rule Loading
 
 Load detailed rules only when relevant.
