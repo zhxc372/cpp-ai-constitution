@@ -1,20 +1,16 @@
-<!--
-AUTOMATICALLY GENERATED FILE - DO NOT EDIT DIRECTLY
-Edit project.yaml and templates/README_CN.md.j2 instead.
-Run scripts/build_readme.py to regenerate.
--->
-# cpp-ai-constitution
+# {{ project.name }}
 
 [English](README.md) | **中文**
 
-面向AI编程Agent的C++工具无关约束系统
+{{ project.tagline_zh }}
 
+{%- if version %}
+> 版本 {{ project.version }}
+{%- endif %}
 
-面向AI编程Agent的C++约束系统。不是压缩版教材，是判断引擎。
-通过强制明确的所有权语义、生命周期规则和最佳实践，帮助AI避免常见C++错误。
-兼容OpenCode、Claude Code、Cursor、OpenClaw等所有支持规则或技能的Agent。
-
-
+{% if project.description_zh %}
+{{ project.description_zh }}
+{% endif %}
 
 ## 这不是什么
 
@@ -25,21 +21,9 @@ Run scripts/build_readme.py to regenerate.
 
 ## 兼容性
 
-
-- OpenCode (primary)
-
-- Claude Code
-
-- Cursor
-
-- Codex CLI
-
-- Gemini CLI
-
-- OpenClaw
-
-- Any agent supporting rules/skills
-
+{% for item in compatibility %}
+- {{ item }}
+{% endfor %}
 
 ## 快速开始
 
@@ -79,7 +63,7 @@ cp -r config/ /你的项目/config/
 ### 3. OpenClaw
 
 ```bash
-clawhub install cpp-ai-constitution
+clawhub install {{ project.name }}
 ```
 
 ### 4. 通用AI编程
@@ -92,19 +76,10 @@ clawhub install cpp-ai-constitution
 
 ## 设计哲学
 
-
-### 简洁优先
-默认假设AI已经足够聪明，只添加AI不知道的上下文。
-
-### 渐进加载
-只在需要时加载相关规则，不一次性全量加载，节省token。
-
-### 脚本优先，AI为辅
-确定性任务（静态分析、格式检查）由脚本处理，AI只做判断类工作。
-
-### 工具背书
-优先使用静态分析工具结果，而非AI的主观意见。
-
+{% for principle in project.design_principles_zh %}
+### {{ principle.title }}
+{{ principle.description_zh }}
+{% endfor %}
 
 > **强约束降低熵。**
 
@@ -119,19 +94,15 @@ clawhub install cpp-ai-constitution
 
 | 技能ID | 名称 | 用途 | 使用场景 |
 |--------|------|------|----------|
-| `cpp-core-review` | C++ Core Review | Code review, safety audit, AI output validation | Reviewing any non-trivial C++ code |
-| `cpp-modernize` | C++ Modernizer | C++ migration, systematic refactoring and modernization | Upgrading from older standards (C++98/C++11) to modern C++ |
-| `cpp-debug-audit` | C++ Debug & Audit | Crash debugging, memory error detection, sanitizer analysis | Debugging undefined behavior, leaks, data races or crashes |
-
+{% for skill in skills %}| `{{ skill.id }}` | {{ skill.name }} | {{ skill.purpose }} | {{ skill.when_to_use }} |
+{% endfor %}
 
 ## Agent角色
 
 | 角色ID | 名称 | 职责 | 调用方式 |
 |--------|------|------|----------|
-| `cpp-reviewer` | C++ Strict Reviewer | Read-only, strict C++ code reviewer | `@cpp-reviewer review src/foo.cpp` |
-| `cpp-refactor-planner` | C++ Refactor Planner | Creates safe, step-by-step modernization plans | `@cpp-refactor-planner plan modernization` |
-| `cpp-safety-auditor` | C++ Safety Auditor | Systematic safety audit using sanitizers and static analysis | `@cpp-safety-auditor audit src/` |
-
+{% for agent in agents %}| `{{ agent.id }}` | {{ agent.name }} | {{ agent.role }} | `{{ agent.invocation }}` |
+{% endfor %}
 
 ## 渐进加载
 
@@ -150,10 +121,8 @@ clawhub install cpp-ai-constitution
 
 | 层级 | 内容 | 成本 |
 |---|---|---|
-| Index | Name + description for skill routing | ~50 tokens |
-| Load | Core SKILL.md rules | ~1,500 tokens |
-| Runtime | Specific reference docs, script results | ~0-8,000 tokens (loaded on demand only) |
-
+{% for budget in token_budget %}| {{ budget.layer }} | {{ budget.content }} | {{ budget.cost }} |
+{% endfor %}
 
 ## clang-tidy配置分档
 
@@ -161,31 +130,17 @@ clawhub install cpp-ai-constitution
 
 | 配置名称 | 用途 | 命令 |
 |---|---|---|
-| `minimal` | CI baseline, low false positive rate | `--config-file=config/clang-tidy.minimal.yml` |
-| `migration` | Legacy project migration | `--config-file=config/clang-tidy.migration.yml` |
-| `strict` | New projects or strict safety reviews | `--config-file=config/clang-tidy.strict.yml` |
-
+{% for profile in clang_tidy_profiles %}| `{{ profile.name }}` | {{ profile.purpose }} | `{{ profile.command }}` |
+{% endfor %}
 
 ## 脚本
 
 确定性任务用脚本跑，不烧AI token：
 
 ```bash
-# Detect C++ project structure and build system
-python3 scripts/detect_cpp_project.py
-# Locate or generate compile_commands.json for static analysis
-python3 scripts/find_compile_commands.py
-# Run clang-tidy with summary output for AI consumption
-python3 scripts/run_clang_tidy.py
-# Sync canonical skill files across multiple platform directories
-python3 scripts/sync_skill_targets.py
-# Validate repository structure, frontmatter, configs, and references
-python3 scripts/validate_repo.py
-# Run skill routing evals and generate results report
-python3 scripts/run_evals.py
-# Generate GOTCHAS.md from structured gotchas.yaml
-python3 scripts/build_gotchas_md.py
-
+{% for script in scripts %}# {{ script.purpose }}
+python3 scripts/{{ script.name }}
+{% endfor %}
 ```
 
 ## 审查输出格式
@@ -200,7 +155,7 @@ python3 scripts/build_gotchas_md.py
 ## 目录结构
 
 ```text
-cpp-ai-constitution/
+{{ project.name }}/
 ├── AGENTS.md                       # Agent中立主入口（先读这个）
 ├── SKILL.md                        # 根技能：路由、优先级、宪法
 ├── CLAUDE.md                       # Claude Code精简规则摘要
@@ -219,17 +174,13 @@ cpp-ai-constitution/
 │   ├── classes.md                  # 类设计规则
 │   ├── templates.md                # 模板和concept规则
 │   └── performance.md              # 性能审查清单
-├── .opencode/skills/               # OpenCode技能（共 3 个）
-│   ├── cpp-core-review/SKILL.md
-│   ├── cpp-modernize/SKILL.md
-│   ├── cpp-debug-audit/SKILL.md
-├── .opencode/agents/               # OpenCode角色（共 3 个）
-│   ├── cpp-reviewer.md
-│   ├── cpp-refactor-planner.md
-│   ├── cpp-safety-auditor.md
-├── .claude/skills/                 # Claude Code兼容层
+├── .opencode/skills/               # OpenCode技能（共 {{ skills|length }} 个）
+{% for skill in skills %}│   ├── {{ skill.id }}/SKILL.md
+{% endfor %}├── .opencode/agents/               # OpenCode角色（共 {{ agents|length }} 个）
+{% for agent in agents %}│   ├── {{ agent.id }}.md
+{% endfor %}├── .claude/skills/                 # Claude Code兼容层
 ├── .agents/skills/                 # 通用Agent兼容层
-├── scripts/                        # 自动化脚本（共 7 个）
+├── scripts/                        # 自动化脚本（共 {{ scripts|length }} 个）
 ├── assets/                         # 模板文件
 ├── hooks/                          # Git钩子
 ├── config/                         # 工具配置
@@ -242,15 +193,14 @@ cpp-ai-constitution/
 
 ## 致谢
 
-
-- C++ Core Guidelines by Bjarne Stroustrup, Herb Sutter, et al.
-
-- Perplexity Research - Designing, Refining, and Maintaining Agent Skills
-
-- OpenClaw community for skill best practices
-
+{% for credit in credits %}
+- {{ credit.text }}
+{% endfor %}
 
 ## 许可证
 
-
-MIT-0
+{% if license %}
+{{ license }}
+{% else %}
+MIT
+{% endif %}

@@ -17,6 +17,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install dependencies
+        run: pip install pyyaml jinja2
+
       - name: Compile check all Python scripts
         run: |
           for f in scripts/*.py; do
@@ -33,3 +36,12 @@ jobs:
 
       - name: Validate repository structure
         run: python scripts/validate_repo.py
+
+      - name: Run evals
+        run: python scripts/run_evals.py
+
+      - name: Check rule conflicts
+        run: python scripts/check_rule_conflicts.py
+
+      - name: Build rule index
+        run: python scripts/build_rule_index.py

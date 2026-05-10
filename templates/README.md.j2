@@ -1,23 +1,16 @@
-<!--
-AUTOMATICALLY GENERATED FILE - DO NOT EDIT DIRECTLY
-Edit project.yaml and templates/README.md.j2 instead.
-Run scripts/build_readme.py to regenerate.
--->
-# cpp-ai-constitution
+# {{ project.name }}
 
 **English** | [中文](README_CN.md)
 
-Tool-agnostic C++ constraint system for AI coding agents
+{{ project.tagline }}
 
+{%- if version %}
+> Version {{ project.version }}
+{%- endif %}
 
-> ⚠️ 本项目受 [PROJECT_CONSTITUTION.md](PROJECT_CONSTITUTION.md) 最高约束。
-> 所有适配层必须遵守 [ADAPTER_POLICY.md](ADAPTER_POLICY.md)。
-> 规则准入遵循 [RULE_ADMISSION.md](RULE_ADMISSION.md)。
-
-Inspired by C++ Core Guidelines and [Perplexity's Skill design methodology](https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity).
-
-
-
+{% if project.description %}
+{{ project.description }}
+{% endif %}
 
 ## What This Is Not
 
@@ -28,21 +21,9 @@ Inspired by C++ Core Guidelines and [Perplexity's Skill design methodology](http
 
 ## Compatibility
 
-
-- OpenCode (primary)
-
-- Claude Code
-
-- Cursor
-
-- Codex CLI
-
-- Gemini CLI
-
-- OpenClaw
-
-- Any agent supporting rules/skills
-
+{% for item in compatibility %}
+- {{ item }}
+{% endfor %}
 
 ## Quick Start
 
@@ -82,7 +63,7 @@ Tell Claude: "Follow CLAUDE.md and references/*.md."
 ### 3. OpenClaw
 
 ```bash
-clawhub install cpp-ai-constitution
+clawhub install {{ project.name }}
 ```
 
 Or copy `SKILL.md` and rule files into your workspace skills directory.
@@ -97,19 +78,10 @@ Create `.cursor/rules/cpp.mdc` referencing `AGENTS.md` and `references/`.
 
 ## Design Philosophy
 
-
-### Concise is key
-Default assumption is AI is already very smart. Only add context AI doesn't already have.
-
-### Progressive loading
-Only load relevant rules when needed, not everything upfront to save tokens.
-
-### Script first, AI second
-Deterministic tasks (static analysis, format checks) handled by scripts, AI only does judgment work.
-
-### Tool backed
-Prefer static analysis tool results over subjective AI opinions.
-
+{% for principle in project.design_principles %}
+### {{ principle.title }}
+{{ principle.description }}
+{% endfor %}
 
 > **Strong constraints reduce entropy.**
 
@@ -124,19 +96,15 @@ Every rule must justify its token cost. If the model already knows it, delete it
 
 | Skill ID | Name | Purpose | When to Use |
 |----------|------|---------|-------------|
-| `cpp-core-review` | C++ Core Review | Code review, safety audit, AI output validation | Reviewing any non-trivial C++ code |
-| `cpp-modernize` | C++ Modernizer | C++ migration, systematic refactoring and modernization | Upgrading from older standards (C++98/C++11) to modern C++ |
-| `cpp-debug-audit` | C++ Debug & Audit | Crash debugging, memory error detection, sanitizer analysis | Debugging undefined behavior, leaks, data races or crashes |
-
+{% for skill in skills %}| `{{ skill.id }}` | {{ skill.name }} | {{ skill.purpose }} | {{ skill.when_to_use }} |
+{% endfor %}
 
 ## Agent Roles
 
 | Agent ID | Name | Role | How to Invoke |
 |----------|------|------|---------------|
-| `cpp-reviewer` | C++ Strict Reviewer | Read-only, strict C++ code reviewer | `@cpp-reviewer review src/foo.cpp` |
-| `cpp-refactor-planner` | C++ Refactor Planner | Creates safe, step-by-step modernization plans | `@cpp-refactor-planner plan modernization` |
-| `cpp-safety-auditor` | C++ Safety Auditor | Systematic safety audit using sanitizers and static analysis | `@cpp-safety-auditor audit src/` |
-
+{% for agent in agents %}| `{{ agent.id }}` | {{ agent.name }} | {{ agent.role }} | `{{ agent.invocation }}` |
+{% endfor %}
 
 ## Progressive Loading
 
@@ -155,10 +123,8 @@ The root `SKILL.md` (~1,500 tokens) is the only thing loaded by default. Everyth
 
 | Layer | Content | Cost |
 |---|---|---|
-| Index | Name + description for skill routing | ~50 tokens |
-| Load | Core SKILL.md rules | ~1,500 tokens |
-| Runtime | Specific reference docs, script results | ~0-8,000 tokens (loaded on demand only) |
-
+{% for budget in token_budget %}| {{ budget.layer }} | {{ budget.content }} | {{ budget.cost }} |
+{% endfor %}
 
 ## clang-tidy Profiles
 
@@ -166,31 +132,17 @@ Three profiles for different project stages:
 
 | Profile | Use Case | Command |
 |---|---|---|
-| `minimal` | CI baseline, low false positive rate | `--config-file=config/clang-tidy.minimal.yml` |
-| `migration` | Legacy project migration | `--config-file=config/clang-tidy.migration.yml` |
-| `strict` | New projects or strict safety reviews | `--config-file=config/clang-tidy.strict.yml` |
-
+{% for profile in clang_tidy_profiles %}| `{{ profile.name }}` | {{ profile.purpose }} | `{{ profile.command }}` |
+{% endfor %}
 
 ## Scripts
 
 Run deterministic tasks without burning AI tokens:
 
 ```bash
-# Detect C++ project structure and build system
-python3 scripts/detect_cpp_project.py
-# Locate or generate compile_commands.json for static analysis
-python3 scripts/find_compile_commands.py
-# Run clang-tidy with summary output for AI consumption
-python3 scripts/run_clang_tidy.py
-# Sync canonical skill files across multiple platform directories
-python3 scripts/sync_skill_targets.py
-# Validate repository structure, frontmatter, configs, and references
-python3 scripts/validate_repo.py
-# Run skill routing evals and generate results report
-python3 scripts/run_evals.py
-# Generate GOTCHAS.md from structured gotchas.yaml
-python3 scripts/build_gotchas_md.py
-
+{% for script in scripts %}# {{ script.purpose }}
+python3 scripts/{{ script.name }}
+{% endfor %}
 ```
 
 ## Review Output Format
@@ -205,7 +157,7 @@ Findings categorized by severity:
 ## Directory Structure
 
 ```text
-cpp-ai-constitution/
+{{ project.name }}/
 ├── AGENTS.md                       # Agent-neutral main entry (read this first)
 ├── SKILL.md                        # Root skill: routing, priorities, constitution
 ├── CLAUDE.md                       # Compact rule summary for Claude Code
@@ -224,17 +176,13 @@ cpp-ai-constitution/
 │   ├── classes.md                  # Class design rules
 │   ├── templates.md                # Template and concept rules
 │   └── performance.md              # Performance review checklist
-├── .opencode/skills/               # OpenCode skills (3)
-│   ├── cpp-core-review/SKILL.md
-│   ├── cpp-modernize/SKILL.md
-│   ├── cpp-debug-audit/SKILL.md
-├── .opencode/agents/               # OpenCode agents (3)
-│   ├── cpp-reviewer.md
-│   ├── cpp-refactor-planner.md
-│   ├── cpp-safety-auditor.md
-├── .claude/skills/                 # Claude Code compatibility
+├── .opencode/skills/               # OpenCode skills ({{ skills|length }})
+{% for skill in skills %}│   ├── {{ skill.id }}/SKILL.md
+{% endfor %}├── .opencode/agents/               # OpenCode agents ({{ agents|length }})
+{% for agent in agents %}│   ├── {{ agent.id }}.md
+{% endfor %}├── .claude/skills/                 # Claude Code compatibility
 ├── .agents/skills/                 # Generic agent compatibility
-├── scripts/                        # Automation (7 scripts)
+├── scripts/                        # Automation ({{ scripts|length }} scripts)
 ├── assets/                         # Templates
 ├── hooks/                          # Git hooks
 ├── config/                         # Tool configurations
@@ -247,15 +195,14 @@ cpp-ai-constitution/
 
 ## Credits
 
-
-- C++ Core Guidelines by Bjarne Stroustrup, Herb Sutter, et al.
-
-- Perplexity Research - Designing, Refining, and Maintaining Agent Skills
-
-- OpenClaw community for skill best practices
-
+{% for credit in credits %}
+- {{ credit.text }}
+{% endfor %}
 
 ## License
 
-
-MIT-0
+{% if license %}
+{{ license }}
+{% else %}
+MIT
+{% endif %}

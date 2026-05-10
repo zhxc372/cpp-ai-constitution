@@ -1,0 +1,438 @@
+{
+  "categories": {
+    "index": [
+      "rule-map.md"
+    ],
+    "ownership": [
+      "lifetime.md",
+      "resource-management.md"
+    ],
+    "lifetime": [
+      "lifetime.md"
+    ],
+    "dangling": [
+      "lifetime.md"
+    ],
+    "references": [
+      "lifetime.md"
+    ],
+    "pointers": [
+      "lifetime.md"
+    ],
+    "raii": [
+      "resource-management.md"
+    ],
+    "smart pointers": [
+      "resource-management.md"
+    ],
+    "resources": [
+      "resource-management.md"
+    ],
+    "memory": [
+      "resource-management.md",
+      "performance.md"
+    ],
+    "thread": [
+      "concurrency.md"
+    ],
+    "concurrency": [
+      "concurrency.md"
+    ],
+    "data race": [
+      "concurrency.md"
+    ],
+    "lock": [
+      "concurrency.md"
+    ],
+    "async": [
+      "concurrency.md"
+    ],
+    "thread safety": [
+      "concurrency.md"
+    ],
+    "exception": [
+      "error-handling.md"
+    ],
+    "error": [
+      "error-handling.md"
+    ],
+    "try-catch": [
+      "error-handling.md"
+    ],
+    "std::expected": [
+      "error-handling.md"
+    ],
+    "error code": [
+      "error-handling.md"
+    ],
+    "noexcept": [
+      "error-handling.md"
+    ],
+    "api": [
+      "interfaces.md"
+    ],
+    "interface": [
+      "interfaces.md"
+    ],
+    "design": [
+      "interfaces.md"
+    ],
+    "public": [
+      "interfaces.md"
+    ],
+    "function": [
+      "interfaces.md"
+    ],
+    "method": [
+      "interfaces.md"
+    ],
+    "ABI": [
+      "interfaces.md"
+    ],
+    "class": [
+      "classes.md"
+    ],
+    "constructor": [
+      "classes.md"
+    ],
+    "destructor": [
+      "classes.md"
+    ],
+    "inheritance": [
+      "classes.md"
+    ],
+    "virtual": [
+      "classes.md"
+    ],
+    "object": [
+      "classes.md"
+    ],
+    "template": [
+      "templates.md"
+    ],
+    "concept": [
+      "templates.md"
+    ],
+    "generic": [
+      "templates.md"
+    ],
+    "metaprogramming": [
+      "templates.md"
+    ],
+    "TMP": [
+      "templates.md"
+    ],
+    "performance": [
+      "performance.md"
+    ],
+    "optimization": [
+      "performance.md"
+    ],
+    "speed": [
+      "performance.md"
+    ],
+    "cache": [
+      "performance.md"
+    ],
+    "hot path": [
+      "performance.md"
+    ],
+    "profile": [
+      "performance.md"
+    ]
+  },
+  "file_mapping": {
+    "rule-map.md": {
+      "categories": [
+        "index"
+      ],
+      "keywords": [
+        "exception",
+        "policy",
+        "map",
+        "conditionally",
+        "new",
+        "delete",
+        "rule",
+        "always",
+        "apply"
+      ],
+      "path": "references/rule-map.md"
+    },
+    "lifetime.md": {
+      "categories": [
+        "ownership",
+        "lifetime",
+        "dangling",
+        "references",
+        "pointers"
+      ],
+      "keywords": [
+        "this",
+        "ownership",
+        "semantics",
+        "lifetime",
+        "patterns",
+        "const",
+        "weak_ptr",
+        "transfer",
+        "hazards",
+        "and",
+        "classification",
+        "move",
+        "shared_ptr",
+        "enable_shared_from_this",
+        "owning",
+        "dangling",
+        "unique_ptr",
+        "string_view",
+        "pointer",
+        "references",
+        "traps",
+        "span"
+      ],
+      "path": "references/lifetime.md"
+    },
+    "resource-management.md": {
+      "categories": [
+        "raii",
+        "ownership",
+        "smart pointers",
+        "resources",
+        "memory"
+      ],
+      "keywords": [
+        "vs",
+        "common",
+        "management",
+        "resource",
+        "custom",
+        "shared_ptr",
+        "raii",
+        "heap",
+        "mistakes",
+        "deleters",
+        "rules",
+        "stack"
+      ],
+      "path": "references/resource-management.md"
+    },
+    "concurrency.md": {
+      "categories": [
+        "thread",
+        "concurrency",
+        "data race",
+        "lock",
+        "async",
+        "thread safety"
+      ],
+      "keywords": [
+        "this",
+        "ai",
+        "avoid",
+        "patterns",
+        "call_once",
+        "const",
+        "concurrency",
+        "atomic",
+        "shared_mutex",
+        "latch",
+        "mistakes",
+        "jthread",
+        "thread",
+        "volatile",
+        "stop_source",
+        "lock_guard",
+        "mutex",
+        "common",
+        "prefer",
+        "rules"
+      ],
+      "path": "references/concurrency.md"
+    },
+    "error-handling.md": {
+      "categories": [
+        "exception",
+        "error",
+        "try-catch",
+        "std::expected",
+        "error code",
+        "noexcept"
+      ],
+      "keywords": [
+        "exception",
+        "error",
+        "ai",
+        "strategy",
+        "noexcept",
+        "handling",
+        "safety",
+        "and",
+        "throw",
+        "selection",
+        "error_code",
+        "basic",
+        "mistakes",
+        "errno",
+        "exceptions",
+        "strong",
+        "levels",
+        "common",
+        "rules"
+      ],
+      "path": "references/error-handling.md"
+    },
+    "interfaces.md": {
+      "categories": [
+        "api",
+        "interface",
+        "design",
+        "public",
+        "function",
+        "method",
+        "ABI"
+      ],
+      "keywords": [
+        "interfaces",
+        "common",
+        "design",
+        "api",
+        "ai",
+        "mistakes",
+        "explicit",
+        "string_view",
+        "noexcept",
+        "boundary",
+        "patterns",
+        "const",
+        "rules",
+        "span"
+      ],
+      "path": "references/interfaces.md"
+    },
+    "classes.md": {
+      "categories": [
+        "class",
+        "constructor",
+        "destructor",
+        "inheritance",
+        "virtual",
+        "object"
+      ],
+      "keywords": [
+        "override",
+        "common",
+        "types",
+        "ai",
+        "classes",
+        "mistakes",
+        "value",
+        "rules",
+        "polymorphic",
+        "vs"
+      ],
+      "path": "references/classes.md"
+    },
+    "templates.md": {
+      "categories": [
+        "template",
+        "concept",
+        "generic",
+        "metaprogramming",
+        "TMP"
+      ],
+      "keywords": [
+        "common",
+        "templates",
+        "and",
+        "concepts",
+        "ai",
+        "mistakes",
+        "patterns",
+        "rules"
+      ],
+      "path": "references/templates.md"
+    },
+    "performance.md": {
+      "categories": [
+        "performance",
+        "optimization",
+        "speed",
+        "memory",
+        "cache",
+        "hot path",
+        "profile"
+      ],
+      "keywords": [
+        "perf",
+        "tools",
+        "common",
+        "hot",
+        "unordered_map",
+        "vector",
+        "instruments",
+        "function",
+        "checklist",
+        "path",
+        "ai",
+        "shared_ptr",
+        "measurement",
+        "mistakes",
+        "vtune",
+        "performance",
+        "any",
+        "rules"
+      ],
+      "path": "references/performance.md"
+    }
+  },
+  "keyword_mapping": {
+    "exception": [
+      "rule-map.md",
+      "error-handling.md"
+    ],
+    "lifetime": [
+      "lifetime.md"
+    ],
+    "const": [
+      "lifetime.md",
+      "concurrency.md",
+      "interfaces.md"
+    ],
+    "weak_ptr": [
+      "lifetime.md"
+    ],
+    "shared_ptr": [
+      "lifetime.md",
+      "resource-management.md",
+      "performance.md"
+    ],
+    "dangling": [
+      "lifetime.md"
+    ],
+    "unique_ptr": [
+      "lifetime.md"
+    ],
+    "string_view": [
+      "lifetime.md",
+      "interfaces.md"
+    ],
+    "span": [
+      "lifetime.md",
+      "interfaces.md"
+    ],
+    "raii": [
+      "resource-management.md"
+    ],
+    "noexcept": [
+      "error-handling.md",
+      "interfaces.md"
+    ]
+  },
+  "metadata": {
+    "total_files": 9,
+    "total_categories": 46,
+    "total_keywords": 11,
+    "generated_by": "scripts/build_rule_index.py"
+  }
+}

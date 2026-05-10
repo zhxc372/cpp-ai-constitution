@@ -1,0 +1,50 @@
+- id: ownership_review_001
+  query: Review this C++ class for ownership and lifetime bugs.
+  should_load: true
+  expected_skills: [cpp-core-review]
+  reason: C++ ownership and lifetime review explicitly requested
+- id: modernize_legacy_001
+  query: Refactor this legacy C++98 module toward modern C++.
+  should_load: true
+  expected_skills: [cpp-modernize]
+  reason: C++ modernization task explicitly requested
+- id: debug_crash_001
+  query: Debug this C++ crash - looks like a memory issue.
+  should_load: true
+  expected_skills: [cpp-core-review, cpp-debug-audit]
+  reason: Debugging C++ memory/crash issue triggers both review and debug skills
+- id: audit_safety_001
+  query: Audit this codebase for safety issues.
+  should_load: true
+  expected_skills: [cpp-core-review, cpp-safety-auditor]
+  reason: C++ safety audit triggers both review and auditor roles
+- id: async_lambda_check_001
+  query: Check if this async lambda has dangling reference risks.
+  should_load: true
+  expected_skills: [cpp-core-review]
+  reason: C++ concurrency/lifetime review requested
+- id: raii_exception_check_001
+  query: Audit this module for RAII and exception safety.
+  should_load: true
+  expected_skills: [cpp-core-review]
+  reason: C++ RAII/exception safety audit requested
+- id: plugin_api_design_001
+  query: Help design a C++ plugin API with clear ownership rules.
+  should_load: true
+  expected_skills: [cpp-core-review]
+  reason: C++ API design requiring ownership semantics
+- id: core_guidelines_review_001
+  query: Review this C++ code against Core Guidelines.
+  should_load: true
+  expected_skills: [cpp-core-review]
+  reason: Core Guidelines review explicitly requested
+- id: undefined_behavior_find_001
+  query: Find possible undefined behavior in this C++ module.
+  should_load: true
+  expected_skills: [cpp-core-review]
+  reason: UB detection requires C++ safety knowledge
+- id: refactor_plan_001
+  query: Create a plan to modernize this C++11 codebase to C++20.
+  should_load: true
+  expected_skills: [cpp-refactor-planner, cpp-modernize]
+  reason: Modernization planning explicitly requested

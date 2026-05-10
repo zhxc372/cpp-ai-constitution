@@ -55,6 +55,18 @@ def check_json(filepath, label=""):
         errors.append(f"[FAIL] {label or filepath}: invalid JSON - {e}")
 
 
+def check_yaml(filepath, label=""):
+    """Check valid YAML."""
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            yaml.safe_load(f)
+        print(f"[OK] {label or filepath} valid YAML")
+    except yaml.YAMLError as e:
+        errors.append(f"[FAIL] {label or filepath}: invalid YAML - {e}")
+    except FileNotFoundError:
+        errors.append(f"[FAIL] {label or filepath}: file not found")
+
+
 def check_python(filepath, label=""):
     """Check Python syntax."""
     try:
@@ -103,12 +115,17 @@ def check_readme_references():
             continue
         text = path.read_text()
         import re
-        refs = re.findall(r'`([^`]+\.(?:md|yml|yaml|json|py|sh))`', text)
+        # First remove code blocks to avoid matching command arguments
+        text_no_code = re.sub(r'```.*?```', '', text, flags=re.DOTALL)
+        refs = re.findall(r'`([^`]+\.(?:md|yml|yaml|json|py|sh))`', text_no_code)
         for ref in set(refs):
             # Strip common prefixes like --config-file= etc.
             ref = re.sub(r'^[\-\-]+[\w\-]*=', '', ref)
             # Skip globs
             if '*' in ref:
+                continue
+            # Skip command-line arguments that look like paths
+            if '=' in ref or '--' in ref:
                 continue
             # Try as-is, then with common prefixes
             candidates = [ref]
@@ -150,20 +167,36 @@ def main():
         for f in scripts_dir.glob("*.py"):
             check_python(f, f.relative_to(ROOT))
 
-    # 6. Sync consistency
+    # 6. YAML data files
+    print("\n--- YAML Data Files ---")
+    check_yaml(ROOT / "project.yaml", "project.yaml")
+    check_yaml(ROOT / "data" / "gotchas.yaml", "data/gotchas.yaml")
+    evals_dir = ROOT / "evals"
+    if evals_dir.exists():
+        for f in evals_dir.glob("*.yaml"):
+            check_yaml(f, f.relative_to(ROOT))
+    workflows_dir = ROOT / ".github" / "workflows"
+    if workflows_dir.exists():
+        for f in workflows_dir.glob("*.yml"):
+            check_yaml(f, f.relative_to(ROOT))
+
+    # 7. Sync consistency
     check_sync_consistency()
 
-    # 7. README references
+    # 8. README references
     print("\n--- README References ---")
     check_readme_references()
 
-    # 8. Essential files
+    # 9. Essential files
     print("\n--- Essential Files ---")
     essentials = [
         "AGENTS.md", "CLAUDE.md", "SKILL.md", "GOTCHAS.md",
         "README.md", "README_CN.md",
         "references/rule-map.md",
         "config/.clang-format",
+        "config/clang-tidy.minimal.yml",
+        "config/clang-tidy.migration.yml",
+        "config/clang-tidy.strict.yml",
     ]
     for f in essentials:
         check_file_exists(f)

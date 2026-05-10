@@ -1,0 +1,40 @@
+- id: tutorial_hello_world_001
+  query: Write hello world in C++.
+  should_load: false
+  reason: Too basic, no non-trivial review needed
+- id: explain_pointer_beginner_001
+  query: Explain what a C++ pointer is to a beginner.
+  should_load: false
+  reason: Basic educational question, no code review
+- id: compare_rust_cpp_general_001
+  query: Compare Rust and C++ at a high level.
+  should_load: false
+  reason: General language comparison, no code review
+- id: format_only_clang_format_001
+  query: Format this C++ code with clang-format.
+  should_load: false
+  reason: Only formatting, no review needed
+- id: translate_comment_001
+  query: Translate this C++ comment from Chinese to English.
+  should_load: false
+  reason: Translation task, no review needed
+- id: oop_explain_general_001
+  query: Explain object-oriented programming generally.
+  should_load: false
+  reason: General concept, not C++ code specific
+- id: install_compiler_001
+  query: Help me install a C++ compiler on Ubuntu.
+  should_load: false
+  reason: Environment setup, no review needed
+- id: regex_pattern_write_001
+  query: Write a C++ regex to parse this log format.
+  should_load: false
+  reason: Simple code writing, no review needed
+- id: virtual_function_explain_001
+  query: Explain how virtual functions work in C++.
+  should_load: false
+  reason: Educational question, no code review
+- id: build_error_solve_001
+  query: Help me solve this C++ linker error.
+  should_load: false
+  reason: Build issue, not code review
