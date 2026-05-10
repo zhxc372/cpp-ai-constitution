@@ -92,6 +92,8 @@ def check_readme_references():
         import re
         refs = re.findall(r'`([^`]+\.(?:md|yml|yaml|json|py|sh))`', text)
         for ref in set(refs):
+            # Strip common prefixes like --config-file= etc.
+            ref = re.sub(r'^[\-\-]+[\w\-]*=', '', ref)
             # Skip globs
             if '*' in ref:
                 continue

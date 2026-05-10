@@ -4,7 +4,14 @@
 import json
 import subprocess
 import sys
+import argparse
 from pathlib import Path
+
+PROFILES = {
+    "minimal": "config/clang-tidy.minimal.yml",
+    "migration": "config/clang-tidy.migration.yml",
+    "strict": "config/clang-tidy.strict.yml",
+}
 
 
 def find_files():
@@ -50,6 +57,27 @@ def summarize(output):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Run clang-tidy with profile support")
+    parser.add_argument("--profile", choices=list(PROFILES.keys()),
+                        help="Preset profile: minimal, migration, strict")
+    parser.add_argument("--config-file", help="Custom config file path")
+    args = parser.parse_args()
+
+    # Determine config file
+    if args.profile:
+        config_file = PROFILES[args.profile]
+        print(f"Using profile: {args.profile} → {config_file}")
+    elif args.config_file:
+        config_file = args.config_file
+        print(f"Using custom config: {config_file}")
+    else:
+        config_file = "config/.clang-tidy"
+        print(f"Using default config: {config_file}")
+
+    if not Path(config_file).exists():
+        print(f"ERROR: config file not found: {config_file}")
+        return 1
+
     files = find_files()
     if not files:
         print("No C++ files found.")
@@ -62,7 +90,7 @@ def main():
 
     for f in files:
         print(f"Checking {f}...")
-        output = run_clang_tidy(f)
+        output = run_clang_tidy(f, config_file)
         counts = summarize(output)
         for k in total:
             total[k] += counts[k]
