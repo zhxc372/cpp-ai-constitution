@@ -28,20 +28,24 @@ Inspired by C++ Core Guidelines and [Perplexity's Skill design methodology](http
 
 ## Compatibility
 
+See [ADAPTER_MATRIX.md](ADAPTER_MATRIX.md) for full details.
 
-- OpenCode (primary)
+| Platform | Support Level | Auto-load | Verified |
+|----------|--------------|------------|----------|
+| OpenCode | Officially Supported | ✅ | ✅ validate_repo.py |
+| Claude Code | Supported | ✅ | ✅ validate_repo.py |
+| OpenClaw | Supported | ✅ | ✅ validate_repo.py |
+| Cursor | Recipe Only | ⚠️ Manual | Manual only |
+| Codex CLI | Recipe Only | ⚠️ Manual | Manual only |
+| Gemini CLI | Recipe Only | ⚠️ Manual | Manual only |
+| Any LLM | Level 1: Manual Copy | ❌ | Not applicable |
 
-- Claude Code
+### Support Level Definitions
 
-- Cursor
-
-- Codex CLI
-
-- Gemini CLI
-
-- OpenClaw
-
-- Any agent supporting rules/skills
+- **Officially Supported**: Has entry files, auto-load, eval tests, and manual verification
+- **Supported**: Has entry files and sync verification
+- **Recipe Only**: Has entry files but no automated verification
+- **Level 1**: Manual copy, no tool integration
 
 
 ## Quick Start
@@ -186,8 +190,15 @@ python3 scripts/run_clang_tidy.py
 python3 scripts/sync_skill_targets.py
 # Validate repository structure, frontmatter, configs, and references
 python3 scripts/validate_repo.py
-# Run skill routing evals and generate results report
-python3 scripts/run_evals.py
+# Run skill routing evals
+## Eval Levels:
+##   L1 (run_evals.py): keyword simulation — smoke test for rule definitions
+##   L2 (run_evals_l2.py): adapter file consistency (structure + header + sync)
+##   L3 (run_evals_l3.py): real agent smoke eval (requires live agent)
+## L1 is NOT real platform routing verification. README must not claim otherwise.
+python3 scripts/run_evals.py       # L1: keyword simulation
+python3 scripts/run_evals_l2.py    # L2: adapter consistency
+python3 scripts/run_evals_l3.py    # L3: real agent (manual mode if no agent)
 # Generate GOTCHAS.md from structured gotchas.yaml
 python3 scripts/build_gotchas_md.py
 

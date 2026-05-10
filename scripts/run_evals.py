@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 """
-Run evals to validate skill routing and behavior.
+L1 Keyword Simulation Evals.
+
+This is a rule-based keyword simulation test. It checks whether the skill's
+trigger keywords match expected patterns. This is NOT a real platform routing
+test — it only verifies that YAML-defined keywords produce expected outcomes.
+
+Eval Levels:
+  L1 (this file): keyword simulation — smoke test for rule definitions
+  L2: run_evals_l2.py — adapter file consistency (structure + header + sync)
+  L3: run_evals_l3.py — real agent smoke eval (requires live agent)
+
+Do NOT cite L1 results as real platform routing verification.
+
 Checks:
 1. Positive cases load the correct skills
 2. Negative cases do NOT load any skills

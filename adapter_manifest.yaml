@@ -1,0 +1,22 @@
+# Adapter Manifest
+# Defines all adapter targets for sync_skill_targets.py
+# Each entry specifies the target file and its sync source.
+
+targets:
+  - name: "opencode-core-review"
+    source: "SKILL.md"
+    target: ".opencode/skills/cpp-core-review/SKILL.md"
+    platform: "opencode"
+    support_level: "officially_supported"
+
+  - name: "claude-core-review"
+    source: "SKILL.md"
+    target: ".claude/skills/cpp-core-review/SKILL.md"
+    platform: "claude-code"
+    support_level: "supported"
+
+  - name: "openclaw-core-review"
+    source: "SKILL.md"
+    target: ".agents/skills/cpp-core-review/SKILL.md"
+    platform: "openclaw"
+    support_level: "supported"

@@ -19,9 +19,12 @@ def add_adapter_header(text: str) -> str:
     if ADAPTER_HEADER in text:
         return text
     if text.startswith("---"):
-        parts = text.split("---", 2)
-        if len(parts) >= 3:
-            return f"---{parts[1]}---\n{ADAPTER_HEADER}\n{parts[2]}"
+        rest = text[3:]
+        idx = rest.find("\n---")
+        if idx >= 0:
+            frontmatter = text[:3 + idx + 4]
+            body = text[3 + idx + 4:].lstrip("\n")
+            return f"{frontmatter}\n{ADAPTER_HEADER}\n{body}"
     return f"{ADAPTER_HEADER}\n\n{text}"
 
 
@@ -207,7 +210,9 @@ def main():
         "PROJECT_CONSTITUTION.md",
         "DECISION_RIGHTS.md",
         "ADAPTER_POLICY.md",
+        "ADAPTER_MATRIX.md",
         "RULE_ADMISSION.md",
+        "adapter_manifest.yaml",
         "evals/adapter-consistency.yaml",
     ]
     for f in gov_files:

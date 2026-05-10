@@ -3,8 +3,6 @@ name: cpp-core-review
 description: Load when reviewing, refactoring, modernizing, debugging, or designing non-trivial C++ code where ownership, lifetime, RAII, concurrency, templates, interfaces, exceptions, or Core Guidelines compliance may affect correctness, safety, maintainability, or performance.
 ---
 <!-- Adapter Notice: This file is not a source of truth. Follow PROJECT_CONSTITUTION.md and core references. -->
-
-
 # C++ Core Review
 
 ## Review Priority
