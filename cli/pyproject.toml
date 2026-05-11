@@ -22,4 +22,4 @@ where = ["."]
 include = ["cpp_constitution*"]
 
 [tool.setuptools.package-data]
-cpp_constitution = ["../templates/**/*"]
+cpp_constitution = ["templates/**/*"]

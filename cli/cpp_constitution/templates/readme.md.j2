@@ -1,0 +1,96 @@
+# {{ project_name }}
+
+C++ project with AI-assisted code review.
+
+## Setup
+
+This project uses [cpp-constitution](https://github.com/zhxc372/cpp-constitution) for structured C++ code review.
+
+### Prerequisites
+
+- C++ compiler ({{ std }} support)
+{% if build == "cmake" %}
+- CMake ≥ 3.14
+{% elif build == "make" %}
+- GNU Make
+{% elif build == "xmake" %}
+- xmake
+{% elif build == "meson" %}
+- Meson + Ninja
+{% elif build == "autotools" %}
+- GNU Autotools
+{% endif %}
+
+### Build
+
+{% if build == "cmake" %}
+```bash
+cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --build build
+```
+{% elif build == "make" %}
+```bash
+make
+```
+{% elif build == "xmake" %}
+```bash
+xmake build
+```
+{% elif build == "meson" %}
+```bash
+meson setup build
+meson compile -C build
+```
+{% elif build == "autotools" %}
+```bash
+./autogen.sh && ./configure && make
+```
+{% else %}
+```bash
+# Define your own build commands
+```
+{% endif %}
+
+## AI Code Review
+
+This project has a C++ review skill. When using an AI coding assistant:
+
+### Triggering Review
+
+Just ask your AI:
+```
+review src/main.cpp
+```
+
+The skill will automatically:
+1. Check for `compile_commands.json` (tool-first)
+2. Run clang-tidy if available
+3. Review code by priority: UB → Ownership → RAII → Concurrency → Error → API → Performance → Style
+
+### Project Config
+
+Edit `CONSTITUTION.md` to change:
+- C++ standard (currently {{ std }})
+- Exception policy (currently {{ 'enabled' if exceptions else 'disabled' }})
+- Build system (currently {{ build }})
+
+### What Gets Caught
+
+The skill focuses on high-impact mistakes:
+- 🔴 Undefined behavior, memory corruption, data races
+- 🟠 Lifetime bugs, resource leaks, dangling references
+- 🟡 Logic errors, wrong API usage
+- 🔵 Modernization opportunities
+- ⚪ Style issues (lowest priority)
+
+### File Structure
+
+```
+{{ project_name }}/
+├── CONSTITUTION.md              # Project config (edit this)
+├── AGENTS.md                    # AI entry point
+├── references/                  # Detailed C++ rules (loaded on demand)
+├── config/                      # clang-tidy profiles
+├── GOTCHAS.md                   # Known AI failure patterns
+└── scripts/validate.sh          # Project validation
+```

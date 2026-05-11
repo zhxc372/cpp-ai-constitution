@@ -16,8 +16,8 @@ _PACKAGE_DIR = Path(__file__).parent
 _PROJECT_DIR = _PACKAGE_DIR.parent  # cli/
 _REPO_ROOT = _PROJECT_DIR.parent  # repo root
 _TEMPLATE_CANDIDATES = [
-    _PROJECT_DIR / "templates",  # cli/templates/ (primary)
-    _PACKAGE_DIR / "templates",  # packaged fallback
+    _PACKAGE_DIR / "templates",  # cpp_constitution/templates/ (packaged)
+    _PROJECT_DIR / "templates",  # cli/templates/ (editable dev)
 ]
 
 # Where each platform stores its skill files
