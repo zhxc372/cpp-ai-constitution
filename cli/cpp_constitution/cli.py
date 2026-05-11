@@ -21,7 +21,7 @@ def main(argv: list[str] | None = None) -> int:
     init.add_argument("target", help="Target project directory")
     init.add_argument(
         "--platform", "-p",
-        choices=["opencode", "claude-code", "cursor", "codex-cli", "gemini-cli", "generic"],
+        choices=["opencode", "claude-code", "trae", "codebuddy", "cursor", "windsurf", "copilot", "amazonq", "lingma", "void", "codex-cli", "gemini-cli", "generic"],
         default=None,
         help="AI coding platform",
     )

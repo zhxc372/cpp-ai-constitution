@@ -66,18 +66,34 @@ def _render_template(env: Environment, name: str, context: dict, output: Path) -
 PLATFORM_SKILL_PATHS = {
     "opencode": [".opencode/skills/cpp-core-review"],
     "claude-code": [".claude/skills/cpp-core-review"],
-    "cursor": [],
-    "codex-cli": [],
+    "trae": [".trae/skills/cpp-core-review"],
+    "codebuddy": [".codebuddy/skills/cpp-core-review"],
     "gemini-cli": [".gemini/skills/cpp-core-review"],
+    # Rule-type platforms (no skill directory)
+    "cursor": [],
+    "windsurf": [],
+    "copilot": [],
+    "amazonq": [],
+    "lingma": [],
+    "void": [],
+    "codex-cli": [],
     "generic": [],
 }
 
 PLATFORM_RULE_FILE = {
     "opencode": None,
     "claude-code": "CLAUDE.md",
-    "cursor": ".cursorrules",
-    "codex-cli": None,
+    "trae": None,
+    "codebuddy": None,
     "gemini-cli": None,
+    # Rule-type platforms
+    "cursor": ".cursor/rules/cpp-review.mdc",
+    "windsurf": ".windsurfrules",
+    "copilot": ".github/copilot-instructions.md",
+    "amazonq": ".amazonq/rules/cpp-review.md",
+    "lingma": ".lingma/rules/cpp-review.md",
+    "void": ".void/rules/cpp-review.md",
+    "codex-cli": None,
     "generic": None,
 }
 
@@ -132,27 +148,44 @@ def generate(args: argparse.Namespace) -> int:
     _render_template(env, "agents.md.j2", ctx, target / "AGENTS.md")
     created_files.append("AGENTS.md")
 
-    # === 3. Skill file (the core) ===
+    # === 3. Skill file OR Rule file (the core) ===
     skill_paths = PLATFORM_SKILL_PATHS.get(config.platform, [])
+    rule_file = PLATFORM_RULE_FILE.get(config.platform)
+
     if skill_paths:
+        # Skill-type platform: generate SKILL.md (references .cpp-constitution/)
         for skill_dir in skill_paths:
             skill_file = target / skill_dir / "SKILL.md"
             _render_template(env, "skill.md.j2", ctx, skill_file)
             created_files.append(f"{skill_dir}/SKILL.md")
+    elif rule_file:
+        # Rule-type platform: generate self-contained rule file
+        # Find the Jinja2 template for this platform
+        platform_dir = template_dir / "platforms" / config.platform
+        # Find template file
+        template_found = None
+        for t in platform_dir.iterdir():
+            if t.suffix == '.j2' and t.is_file():
+                template_found = t
+                break
+        if template_found:
+            # Get relative template name for Jinja2
+            rel_path = template_found.relative_to(template_dir)
+            _render_template(env, str(rel_path), ctx, target / rule_file)
+            created_files.append(rule_file)
     else:
+        # Generic: put skill in skills/ directory
         skill_file = target / "skills" / "cpp-core-review" / "SKILL.md"
         _render_template(env, "skill.md.j2", ctx, skill_file)
         created_files.append("skills/cpp-core-review/SKILL.md")
 
-    # === 4. Platform rule file ===
-    rule_file = PLATFORM_RULE_FILE.get(config.platform)
-    if rule_file:
+    # === 4. Platform additional files (CLAUDE.md, .cursorrules, etc.) ===
+    # For skill-type platforms that also have a rule file (e.g. Claude Code)
+    if skill_paths and rule_file:
         platform_dir = template_dir / "platforms" / config.platform
         candidates = [
             platform_dir / rule_file,
             platform_dir / rule_file.lstrip("."),
-            platform_dir / ("_" + rule_file.lstrip(".").replace(".", "_") + ".md"),
-            platform_dir / (rule_file.lstrip(".").replace(".", "_") + ".md"),
         ]
         src_file = None
         for c in candidates:
