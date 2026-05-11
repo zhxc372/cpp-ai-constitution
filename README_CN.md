@@ -1,256 +1,149 @@
-<!--
-AUTOMATICALLY GENERATED FILE - DO NOT EDIT DIRECTLY
-Edit project.yaml and templates/README_CN.md.j2 instead.
-Run scripts/build_readme.py to regenerate.
--->
 # cpp-ai-constitution
 
 [English](README.md) | **中文**
 
-面向AI编程Agent的C++工具无关约束系统
+C++ review skill for AI编程Agent。装一次，到处用。
 
+灵感来自 [superpowers](https://github.com/obra/superpowers) — markdown skills、thin adapters、no runtime。
 
-面向AI编程Agent的C++约束系统。不是压缩版教材，是判断引擎。
-通过强制明确的所有权语义、生命周期规则和最佳实践，帮助AI避免常见C++错误。
-兼容OpenCode、Claude Code、Cursor、OpenClaw等所有支持规则或技能的Agent。
+---
 
-
-
-## 这不是什么
-
-- C++ 教程
-- C++ Core Guidelines 压缩版
-- "全部现代化" 强制执行工具
-- 加载一次就忘的东西
-
-## 兼容性
-
-
-- OpenCode (primary)
-
-- Claude Code
-
-- Cursor
-
-- Codex CLI
-
-- Gemini CLI
-
-- OpenClaw
-
-- Any agent supporting rules/skills
-
-
-## 快速开始
-
-### 1. OpenCode (推荐)
+## 安装
 
 ```bash
-# 复制宪法到你的C++项目
-cp AGENTS.md /你的项目/AGENTS.md
-cp opencode.json.example /你的项目/opencode.json
-cp -r .opencode/ /你的项目/.opencode/
-cp -r references/ /你的项目/references/
-cp -r scripts/ /你的项目/scripts/
-cp -r config/ /你的项目/config/
-cp -r assets/ /你的项目/assets/
-cp GOTCHAS.md /你的项目/GOTCHAS.md
+pipx install git+https://github.com/zhxc372/cpp-ai-constitution.git#subdirectory=cli
+cd /你的/cpp/项目
+cpp-constitution install .
 ```
 
-在OpenCode中，技能会自动加载：
-
+然后让AI做review：
 ```
-@cpp-reviewer review src/foo.cpp
-@cpp-safety-auditor audit src/
+review src/main.cpp
 ```
 
-### 2. Claude Code
+### 免安装（一次性）
 
 ```bash
-cp CLAUDE.md /你的项目/CLAUDE.md
-cp -r .claude/skills/ /你的项目/.claude/skills/
-cp -r references/ /你的项目/references/
-cp -r scripts/ /你的项目/scripts/
-cp -r config/ /你的项目/config/
+uvx --from git+https://github.com/zhxc372/cpp-ai-constitution.git#subdirectory=cli cpp-constitution install .
 ```
 
-告诉Claude："Follow CLAUDE.md and references/*.md."
+---
 
-### 3. OpenClaw
+## 它做了什么
 
-```bash
-clawhub install cpp-ai-constitution
+**零侵入。** `cpp-constitution install .` 把所有文件放在平台的skill目录内：
+
+```
+your-project/
+├── .opencode/skills/cpp-core-review/    # ← 所有文件在这里
+│   ├── SKILL.md                         # review逻辑
+│   ├── project-config.md                # C++版本、构建系统、异常开关
+│   ├── references/                      # 详细规则（9个文件）
+│   ├── config/                          # clang-tidy配置
+│   └── GOTCHAS.md                       # AI常见失败模式
+└── opencode.json                        # 平台配置（仅OpenCode）
 ```
 
-### 4. 通用AI编程
+根目录没有 `AGENTS.md`。没有 `CONSTITUTION.md`。零污染。
 
-复制 `AGENTS.md` 和需要的 `references/*.md` 到Agent上下文。
+---
 
-### 5. Cursor
+## 平台支持
 
-创建 `.cursor/rules/cpp.mdc`，引用 `AGENTS.md` 和 `references/`。
+| 平台 | 类型 | 安装目标 |
+|------|------|---------|
+| **OpenCode** | Skill | `.opencode/skills/cpp-core-review/` |
+| **Claude Code** | Skill | `.claude/skills/cpp-core-review/` |
+| **Trae** | Skill | `.trae/skills/cpp-core-review/` |
+| **CodeBuddy** | Skill | `.codebuddy/skills/cpp-core-review/` |
+| **Gemini CLI** | Skill | `.gemini/skills/cpp-core-review/` |
+| **Cursor** | Rule | `.cursor/rules/cpp-review.mdc` |
+| **Windsurf** | Rule | `.windsurfrules` |
+| **GitHub Copilot** | Rule | `.github/copilot-instructions.md` |
+| **Amazon Q** | Rule | `.amazonq/rules/cpp-review.md` |
+| **通义灵码** | Rule | `.lingma/rules/cpp-review.md` |
+| **Void** | Rule | `.void/rules/cpp-review.md` |
+| **Codex CLI** | Generic | `AGENTS.md` |
+| **通用** | Generic | `AGENTS.md` |
+
+**Skill型**：SKILL.md + references按需加载（更丰富、结构化）。
+**Rule型**：自包含单文件（无需skill加载机制）。
+**Generic**：根目录AGENTS.md（仅用于不支持skill/rule的平台）。
+
+---
+
+## 静态分析优先
+
+skill鼓励AI在做主观review之前先跑静态分析：
+
+| 工具 | 检测范围 | 命令 |
+|------|---------|------|
+| **clang-tidy** | Bug-prone模式、现代化、可读性 | `clang-tidy -p build <file>` |
+| **cppcheck** | 缓冲区溢出、内存泄漏、UB | `cppcheck --enable=all <file>` |
+| **clazy** | Qt特定反模式 | `clazy -p build <file>` |
+| **include-what-you-use** | 不必要的include、前向声明 | `iwyu -p build <file>` |
+
+没装工具？skill会告诉用户：*"纯AI review — 对机械性问题的置信度较低。建议安装 clang-tidy 或 cppcheck。"*
+
+---
 
 ## 设计哲学
 
+1. **工具优先** — 静态分析在肉眼审查之前
+2. **安全优先于风格** — UB、生命周期、所有权 > 命名、格式
+3. **渐进加载** — SKILL.md保持简短，详细规则按需加载
+4. **零侵入** — 所有文件在skill目录内，根目录零污染
+5. **单一真相源** — 分发仓库从本仓库自动生成
 
-### 简洁优先
-默认假设AI已经足够聪明，只添加AI不知道的上下文。
+---
 
-### 渐进加载
-只在需要时加载相关规则，不一次性全量加载，节省token。
+## 这不是什么
 
-### 脚本优先，AI为辅
-确定性任务（静态分析、格式检查）由脚本处理，AI只做判断类工作。
+- 不是C++教程
+- 不是C++ Core Guidelines压缩版
+- 不是"全部现代化"强制执行工具
+- 不是clang-tidy、sanitizer或测试的替代品
+- 不是agent framework
 
-### 工具背书
-优先使用静态分析工具结果，而非AI的主观意见。
+每条规则必须证明它的token成本是值得的。
 
+---
 
-> **强约束降低熵。**
-
-本项目将C++ Core Guidelines转化为：
-- AI可读的规则（不是人类文档）
-- 静态分析约束（不是风格意见）
-- 工程工作流钩子（不是手动检查清单）
-
-每条规则必须证明它的token成本是值得的。如果模型已经知道了，删掉它。
-
-## 技能
-
-| 技能ID | 名称 | 用途 | 使用场景 |
-|--------|------|------|----------|
-| `cpp-core-review` | C++ Core Review | Code review, safety audit, AI output validation | Reviewing any non-trivial C++ code |
-| `cpp-modernize` | C++ Modernizer | C++ migration, systematic refactoring and modernization | Upgrading from older standards (C++98/C++11) to modern C++ |
-| `cpp-debug-audit` | C++ Debug & Audit | Crash debugging, memory error detection, sanitizer analysis | Debugging undefined behavior, leaks, data races or crashes |
-
-
-## Agent角色
-
-| 角色ID | 名称 | 职责 | 调用方式 |
-|--------|------|------|----------|
-| `cpp-reviewer` | C++ Strict Reviewer | Read-only, strict C++ code reviewer | `@cpp-reviewer review src/foo.cpp` |
-| `cpp-refactor-planner` | C++ Refactor Planner | Creates safe, step-by-step modernization plans | `@cpp-refactor-planner plan modernization` |
-| `cpp-safety-auditor` | C++ Safety Auditor | Systematic safety audit using sanitizers and static analysis | `@cpp-safety-auditor audit src/` |
-
-
-## 渐进加载
-
-根 `SKILL.md`（~1,500 tokens）是默认唯一加载的。其他按需加载：
-
-| 场景 | 加载内容 |
-|---|---|
-| 审查所有权/生命周期代码 | `references/lifetime.md` |
-| 多线程代码 | `references/concurrency.md` |
-| 自定义错误处理 | `references/error-handling.md` |
-| 模板元编程 | `references/templates.md` |
-| 性能关键路径 | `references/performance.md` |
-| 完整审计 | 所有相关 `references/*.md` |
-
-## Token预算
-
-| 层级 | 内容 | 成本 |
-|---|---|---|
-| Index | Name + description for skill routing | ~50 tokens |
-| Load | Core SKILL.md rules | ~1,500 tokens |
-| Runtime | Specific reference docs, script results | ~0-8,000 tokens (loaded on demand only) |
-
-
-## clang-tidy配置分档
-
-三个配置适配不同项目阶段：
-
-| 配置名称 | 用途 | 命令 |
-|---|---|---|
-| `minimal` | CI baseline, low false positive rate | `--config-file=config/clang-tidy.minimal.yml` |
-| `migration` | Legacy project migration | `--config-file=config/clang-tidy.migration.yml` |
-| `strict` | New projects or strict safety reviews | `--config-file=config/clang-tidy.strict.yml` |
-
-
-## 脚本
-
-确定性任务用脚本跑，不烧AI token：
+## 验证
 
 ```bash
-# Detect C++ project structure and build system
-python3 scripts/detect_cpp_project.py
-# Locate or generate compile_commands.json for static analysis
-python3 scripts/find_compile_commands.py
-# Run clang-tidy with summary output for AI consumption
-python3 scripts/run_clang_tidy.py
-# Sync canonical skill files across multiple platform directories
-python3 scripts/sync_skill_targets.py
-# Validate repository structure, frontmatter, configs, and references
+# CLI测试
+cd cli && python3 tests/test_cli.py
+
+# 仓库验证
 python3 scripts/validate_repo.py
-# Run skill routing evals and generate results report
-python3 scripts/run_evals.py
-# Generate GOTCHAS.md from structured gotchas.yaml
-python3 scripts/build_gotchas_md.py
 
+# 生成测试项目
+cpp-constitution install /tmp/demo --platform opencode --std c++20 --build xmake --no-interact
+
+# 验证零侵入
+ls /tmp/demo/  # 应该只有 .opencode/ 和 opencode.json
 ```
 
-## 审查输出格式
+---
 
-发现按严重度分类：
+## 分发
 
-- **Critical**：未定义行为、内存损坏、数据竞争、悬空引用
-- **Major**：脆弱API、不一致的错误处理、隐藏副作用
-- **Minor**：可读性、命名、风格
-- **Do Not Change**：因ABI/遗留/性能约束应保留的代码
+| 仓库 | 角色 |
+|------|------|
+| `cpp-ai-constitution` | 真相源：规则、skills、CLI源码 |
+| `cpp-constitution` | 分发镜像（自动同步） |
 
-## 目录结构
+| 渠道 | 状态 |
+|------|------|
+| `pipx install git+...#subdirectory=cli` | ✅ 主要方式 |
+| `uvx --from git+...#subdirectory=cli` | ✅ 支持 |
+| PyPI (`pip install cpp-constitution`) | 计划中 |
+| ClawHub skill | 计划中（5月23日后） |
+| `npx cpp-constitution` | 计划中 |
 
-```text
-cpp-ai-constitution/
-├── AGENTS.md                       # Agent中立主入口（先读这个）
-├── SKILL.md                        # 根技能：路由、优先级、宪法
-├── CLAUDE.md                       # Claude Code精简规则摘要
-├── GOTCHAS.md                      # C++场景下的AI失败模式（最高价值内容）
-├── opencode.json.example           # OpenCode配置模板
-├── project.yaml                    # 项目元数据（用于README生成）
-├── data/
-│   └── gotchas.yaml                # 结构化gotchas，用于自动生成文档
-├── references/                     # 详细规则（按需加载）
-│   ├── rule-map.md                 # 什么场景用什么规则
-│   ├── lifetime.md                 # 所有权和生命周期陷阱
-│   ├── resource-management.md      # RAII模式和常见问题
-│   ├── concurrency.md              # 线程安全规则
-│   ├── error-handling.md           # 异常和错误处理策略
-│   ├── interfaces.md               # API设计规则
-│   ├── classes.md                  # 类设计规则
-│   ├── templates.md                # 模板和concept规则
-│   └── performance.md              # 性能审查清单
-├── .opencode/skills/               # OpenCode技能（共 3 个）
-│   ├── cpp-core-review/SKILL.md
-│   ├── cpp-modernize/SKILL.md
-│   ├── cpp-debug-audit/SKILL.md
-├── .opencode/agents/               # OpenCode角色（共 3 个）
-│   ├── cpp-reviewer.md
-│   ├── cpp-refactor-planner.md
-│   ├── cpp-safety-auditor.md
-├── .claude/skills/                 # Claude Code兼容层
-├── .agents/skills/                 # 通用Agent兼容层
-├── scripts/                        # 自动化脚本（共 7 个）
-├── assets/                         # 模板文件
-├── hooks/                          # Git钩子
-├── config/                         # 工具配置
-├── prompts/                        # 可复用AI提示词
-├── evals/                          # 技能路由测试
-├── templates/                      # 文档生成用Jinja2模板
-├── .github/workflows/validate.yml  # CI验证
-└── LICENSE
-```
-
-## 致谢
-
-
-- C++ Core Guidelines by Bjarne Stroustrup, Herb Sutter, et al.
-
-- Perplexity Research - Designing, Refining, and Maintaining Agent Skills
-
-- OpenClaw community for skill best practices
-
+---
 
 ## 许可证
-
 
 MIT-0
