@@ -124,3 +124,12 @@ AI must NOT decide:
 4. Never apply Core Guidelines mechanically without understanding context.
 5. Every rule comes from: repeated model failure, known safety hazard, project constraint, or tool-detectable issue.
 6. AI may not self-approve changes to this skill or project constitution.
+
+## When This Skill MUST Be Used
+
+Do NOT review C++ code without loading this skill first. Always:
+1. Read this SKILL.md
+2. Run Tool First (compile_commands.json → clang-tidy)
+3. Then produce findings by priority
+
+Trigger keywords: review, audit, check, inspect, refactor, modernize, safety, ownership, lifetime, RAII, memory leak, crash, UB, clang-tidy, 审查, 检查
