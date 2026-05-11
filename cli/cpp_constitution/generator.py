@@ -7,54 +7,36 @@ import os
 import shutil
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
+import jinja2
+from jinja2 import Environment, BaseLoader
 
 from .prompts import InitConfig, interactive_prompt
 
-# Source of truth: this repo (cli/ is part of cpp-ai-constitution)
-_PACKAGE_DIR = Path(__file__).parent
-_PROJECT_DIR = _PACKAGE_DIR.parent  # cli/
-_REPO_ROOT = _PROJECT_DIR.parent  # repo root
-_TEMPLATE_CANDIDATES = [
-    _PACKAGE_DIR / "templates",  # cpp_constitution/templates/ (packaged)
-    _PROJECT_DIR / "templates",  # cli/templates/ (editable dev)
-]
 
-# Where each platform stores its skill files
-PLATFORM_SKILL_PATHS = {
-    "opencode": [".opencode/skills/cpp-core-review"],
-    "claude-code": [".claude/skills/cpp-core-review"],
-    "cursor": [],
-    "codex-cli": [],
-    "gemini-cli": [".gemini/skills/cpp-core-review"],
-    "generic": [],
-}
+class PackageLoader(BaseLoader):
+    """Load templates from the cpp_constitution/templates package directory."""
 
-PLATFORM_RULE_FILE = {
-    "opencode": None,  # uses .opencode/ structure
-    "claude-code": "CLAUDE.md",
-    "cursor": ".cursorrules",
-    "codex-cli": None,  # uses AGENTS.md
-    "gemini-cli": None,
-    "generic": None,
-}
+    def __init__(self):
+        self.path = Path(__file__).parent / "templates"
+        if not self.path.exists():
+            raise FileNotFoundError(f"Templates not found at {self.path}")
+
+    def get_source(self, environment, template):
+        path = self.path / template
+        if not path.exists():
+            raise jinja2.TemplateNotFound(template)
+        mtime = path.stat().st_mtime
+        source = path.read_text(encoding="utf-8")
+        # Return source, filename, uptodate callable
+        return source, str(path), lambda: path.stat().st_mtime == mtime
 
 
-def _get_template_dir() -> Path:
-    for d in _TEMPLATE_CANDIDATES:
-        if d.exists() and (d / "constitution.md.j2").exists():
-            return d
-    raise FileNotFoundError(
-        f"Templates not found. Searched: {[str(d) for d in _TEMPLATE_CANDIDATES]}"
-    )
+# Repo root for references/config/GOTCHAS.md (source of truth)
+_REPO_ROOT = Path(__file__).parent.parent.parent  # cli/cpp_constitution/../../ → repo root
 
 
 def _get_template_env() -> Environment:
-    template_dir = _get_template_dir()
-    return Environment(
-        loader=FileSystemLoader(str(template_dir)),
-        keep_trailing_newline=True,
-    )
+    return Environment(loader=PackageLoader(), keep_trailing_newline=True)
 
 
 def _ensure_dir(path: Path) -> None:
@@ -81,6 +63,26 @@ def _render_template(env: Environment, name: str, context: dict, output: Path) -
     _ensure_dir(output.parent)
     output.write_text(content, encoding="utf-8")
     return content
+
+
+# Where each platform stores its skill files
+PLATFORM_SKILL_PATHS = {
+    "opencode": [".opencode/skills/cpp-core-review"],
+    "claude-code": [".claude/skills/cpp-core-review"],
+    "cursor": [],
+    "codex-cli": [],
+    "gemini-cli": [".gemini/skills/cpp-core-review"],
+    "generic": [],
+}
+
+PLATFORM_RULE_FILE = {
+    "opencode": None,
+    "claude-code": "CLAUDE.md",
+    "cursor": ".cursorrules",
+    "codex-cli": None,
+    "gemini-cli": None,
+    "generic": None,
+}
 
 
 def generate(args: argparse.Namespace) -> int:
@@ -122,7 +124,7 @@ def generate(args: argparse.Namespace) -> int:
     }
 
     env = _get_template_env()
-    template_dir = _get_template_dir()
+    template_dir = Path(__file__).parent / "templates"
     created_files = []
 
     # === 1. CONSTITUTION.md (minimal project config) ===
@@ -133,7 +135,7 @@ def generate(args: argparse.Namespace) -> int:
     _render_template(env, "agents.md.j2", ctx, target / "AGENTS.md")
     created_files.append("AGENTS.md")
 
-    # === 3. Skill file (the core — rendered from skill.md.j2) ===
+    # === 3. Skill file (the core) ===
     skill_paths = PLATFORM_SKILL_PATHS.get(config.platform, [])
     if skill_paths:
         for skill_dir in skill_paths:
@@ -141,49 +143,44 @@ def generate(args: argparse.Namespace) -> int:
             _render_template(env, "skill.md.j2", ctx, skill_file)
             created_files.append(f"{skill_dir}/SKILL.md")
     else:
-        # Generic: put skill in skills/ directory
         skill_file = target / "skills" / "cpp-core-review" / "SKILL.md"
         _render_template(env, "skill.md.j2", ctx, skill_file)
         created_files.append("skills/cpp-core-review/SKILL.md")
 
-    # === 4. Platform rule file (CLAUDE.md, .cursorrules, etc.) ===
+    # === 4. Platform rule file ===
     rule_file = PLATFORM_RULE_FILE.get(config.platform)
     if rule_file:
-        # Platforms with a specific entry point file (CLAUDE.md, .cursorrules, etc.)
         platform_dir = template_dir / "platforms" / config.platform
-        # Try multiple naming conventions
         candidates = [
             platform_dir / rule_file,
-            platform_dir / rule_file.lstrip('.'),
-            platform_dir / ("_" + rule_file.lstrip('.').replace('.', '_') + ".md"),
-            platform_dir / (rule_file.lstrip('.').replace('.', '_') + ".md"),
+            platform_dir / rule_file.lstrip("."),
+            platform_dir / ("_" + rule_file.lstrip(".").replace(".", "_") + ".md"),
+            platform_dir / (rule_file.lstrip(".").replace(".", "_") + ".md"),
         ]
         src_file = None
         for c in candidates:
             if c.exists():
                 src_file = c
                 break
-
         if src_file:
             dst = target / rule_file
             _ensure_dir(dst.parent)
             shutil.copy2(src_file, dst)
             created_files.append(rule_file)
 
-    # Platform-specific structure (opencode agents, etc.)
+    # Platform-specific structure
     platform_dir = template_dir / "platforms" / config.platform
     if platform_dir.exists():
         agents_dir = platform_dir / "agents"
         if agents_dir.exists():
             copied = _copy_tree(agents_dir, target / "agents")
             created_files.extend(copied)
-        # Copy config files
         for cfg in platform_dir.glob("*.example"):
             dst_name = cfg.name.replace(".example", "")
             shutil.copy2(cfg, target / dst_name)
             created_files.append(dst_name)
 
-    # === 5. References (from repo root — single source of truth) ===
+    # === 5. References (from repo root) ===
     shared_source = _REPO_ROOT
     for item in ["references", "config", "GOTCHAS.md"]:
         src = shared_source / item
@@ -201,7 +198,7 @@ def generate(args: argparse.Namespace) -> int:
     (target / "scripts" / "validate.sh").chmod(0o755)
     created_files.append("scripts/validate.sh")
 
-    # === 7. Build system skeleton (optional, non-overwriting) ===
+    # === 7. Build system skeleton ===
     if config.build != "none":
         build_file_map = {
             "cmake": "CMakeLists.txt",
@@ -221,7 +218,7 @@ def generate(args: argparse.Namespace) -> int:
             else:
                 print(f"  ⏭️  Skipped {output_name} (already exists)")
 
-    # === 8. README.md (usage guide) ===
+    # === 8. README.md ===
     readme_path = target / "README.md"
     if not readme_path.exists():
         _render_template(env, "readme.md.j2", ctx, readme_path)
