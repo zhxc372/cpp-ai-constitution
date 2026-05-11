@@ -1,0 +1,23 @@
+{
+  "name": "cpp-ai-constitution",
+  "description": "Safety-first C++ code review skill: ownership classification, Tool First (clang-tidy + cppcheck), progressive rule loading, zero intrusion",
+  "version": "0.1.2",
+  "author": {
+    "name": "zhxc372",
+    "email": "zhxc372@gmail.com"
+  },
+  "homepage": "https://github.com/zhxc372/cpp-ai-constitution",
+  "repository": "https://github.com/zhxc372/cpp-ai-constitution",
+  "license": "MIT-0",
+  "keywords": [
+    "cpp",
+    "c++",
+    "code-review",
+    "safety",
+    "clang-tidy",
+    "ownership",
+    "lifetime",
+    "RAII"
+  ],
+  "skills": "./skills/"
+}
