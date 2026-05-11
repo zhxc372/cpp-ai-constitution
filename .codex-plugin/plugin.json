@@ -1,0 +1,39 @@
+{
+  "name": "cpp-ai-constitution",
+  "version": "0.1.2",
+  "description": "Safety-first C++ code review skill with Tool First methodology, ownership classification, and progressive rule loading",
+  "author": {
+    "name": "zhxc372",
+    "url": "https://github.com/zhxc372"
+  },
+  "homepage": "https://github.com/zhxc372/cpp-ai-constitution",
+  "repository": "https://github.com/zhxc372/cpp-ai-constitution",
+  "license": "MIT-0",
+  "keywords": [
+    "cpp",
+    "code-review",
+    "safety",
+    "clang-tidy",
+    "ownership"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "C++ AI Constitution",
+    "shortDescription": "Safety-first C++ code review with static analysis and ownership rules",
+    "longDescription": "Install cpp-ai-constitution to give your coding agent C++ safety-first review skills. Enforces Tool First (clang-tidy, cppcheck before eyeballing), ownership classification (no blind smart pointer replacement), progressive rule loading, and known AI failure pattern avoidance.",
+    "developerName": "zhxc372",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Review this C++ code for safety issues",
+      "Do a C++ code review"
+    ],
+    "websiteURL": "https://github.com/zhxc372/cpp-ai-constitution",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service"
+  }
+}
