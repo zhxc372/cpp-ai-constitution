@@ -31,9 +31,6 @@ class PackageLoader(BaseLoader):
         return source, str(path), lambda: path.stat().st_mtime == mtime
 
 
-# Repo root for references/config/GOTCHAS.md (source of truth)
-_REPO_ROOT = Path(__file__).parent.parent.parent  # cli/cpp_constitution/../../ → repo root
-
 
 def _get_template_env() -> Environment:
     return Environment(loader=PackageLoader(), keep_trailing_newline=True)
@@ -180,10 +177,10 @@ def generate(args: argparse.Namespace) -> int:
             shutil.copy2(cfg, target / dst_name)
             created_files.append(dst_name)
 
-    # === 5. References (from repo root) ===
-    shared_source = _REPO_ROOT
+    # === 5. Runtime files (references, config, GOTCHAS) ===
+    runtime_dir = Path(__file__).parent / "runtime"
     for item in ["references", "config", "GOTCHAS.md"]:
-        src = shared_source / item
+        src = runtime_dir / item
         if src.exists():
             if src.is_dir():
                 copied = _copy_tree(src, target / item)
