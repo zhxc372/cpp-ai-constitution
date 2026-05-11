@@ -1,272 +1,169 @@
-<!--
-AUTOMATICALLY GENERATED FILE - DO NOT EDIT DIRECTLY
-Edit project.yaml and templates/README.md.j2 instead.
-Run scripts/build_readme.py to regenerate.
--->
 # cpp-ai-constitution
 
 **English** | [中文](README_CN.md)
 
-Tool-agnostic C++ constraint system for AI coding agents
+Source-of-truth C++ rule system for constraining AI coding agents.
 
+> **User-facing installer:** [cpp-constitution](https://github.com/zhxc372/cpp-constitution)
+> **Source of truth:** this repository
 
-> ⚠️ 本项目受 [PROJECT_CONSTITUTION.md](PROJECT_CONSTITUTION.md) 最高约束。
-> 所有适配层必须遵守 [ADAPTER_POLICY.md](ADAPTER_POLICY.md)。
-> 规则准入遵循 [RULE_ADMISSION.md](RULE_ADMISSION.md)。
-
-Inspired by C++ Core Guidelines and [Perplexity's Skill design methodology](https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity).
-
-
-
-
-## What This Is Not
-
-- A C++ tutorial
-- A compressed copy of C++ Core Guidelines
-- A "modernize everything" enforcement tool
-- Something you load once and forget
-
-## Compatibility
-
-See [ADAPTER_MATRIX.md](ADAPTER_MATRIX.md) for full details.
-
-| Platform | Support Level | Auto-load | Verified |
-|----------|--------------|------------|----------|
-| OpenCode | Officially Supported | ✅ | ✅ Structure Verified |
-| Claude Code | Supported | ✅ | ✅ Structure Verified |
-| OpenClaw | Supported | ✅ | ✅ Structure Verified |
-| Cursor | Recipe Only | ⚠️ Manual | Manual only |
-| Codex CLI | Recipe Only | ⚠️ Manual | Manual only |
-| Gemini CLI | Recipe Only | ⚠️ Manual | Manual only |
-| Any LLM | Level 1: Manual Copy | ❌ | Not applicable |
-
-### Support Level Definitions
-
-- **Officially Supported**: Has entry files, auto-load, eval tests, and manual verification
-- **Supported**: Has entry files and sync verification
-- **Recipe Only**: Has entry files but no automated verification
-- **Level 1**: Manual copy, no tool integration
-
+---
 
 ## Quick Start
 
-### 1. OpenCode (recommended)
+### Recommended: use the CLI
 
 ```bash
-# Copy the constitution into your C++ project
-cp AGENTS.md /your-project/AGENTS.md
-cp opencode.json.example /your-project/opencode.json
-cp -r .opencode/ /your-project/.opencode/
-cp -r references/ /your-project/references/
-cp -r scripts/ /your-project/scripts/
-cp -r config/ /your-project/config/
-cp -r assets/ /your-project/assets/
-cp GOTCHAS.md /your-project/GOTCHAS.md
+pipx install git+https://github.com/zhxc372/cpp-ai-constitution.git#subdirectory=cli
+cd /your/cpp/project
+cpp-constitution init .
 ```
 
-Then in OpenCode, the skills auto-load when you review C++ code:
-
+Then ask your AI agent:
 ```
-@cpp-reviewer review src/foo.cpp
-@cpp-safety-auditor audit src/
+review src/main.cpp
 ```
 
-### 2. Claude Code
+### One-shot run (no install)
 
 ```bash
-cp CLAUDE.md /your-project/CLAUDE.md
-cp -r .claude/skills/ /your-project/.claude/skills/
-cp -r references/ /your-project/references/
-cp -r scripts/ /your-project/scripts/
-cp -r config/ /your-project/config/
+uvx --from git+https://github.com/zhxc372/cpp-ai-constitution.git#subdirectory=cli cpp-constitution init .
 ```
 
-Tell Claude: "Follow CLAUDE.md and references/*.md."
-
-### 3. OpenClaw
+### Manual install (advanced)
 
 ```bash
-clawhub install cpp-ai-constitution
+cp AGENTS.md /your-project/
+cp -r references/ /your-project/
+cp -r config/ /your-project/
+cp GOTCHAS.md /your-project/
 ```
 
-Or copy `SKILL.md` and rule files into your workspace skills directory.
+---
 
-### 4. Generic AI Coding
+## Repository Roles
 
-Copy `AGENTS.md` and selected `references/*.md` into your agent context. Load only what you need.
+| Repository | Role |
+|------------|------|
+| `cpp-ai-constitution` | Source of truth: rules, skills, references, adapters, evals, CLI source |
+| `cpp-constitution` | Distribution mirror: pipx package, command entry point |
 
-### 5. Cursor
+Do not edit generated files in `cpp-constitution` directly. All changes start here.
 
-Create `.cursor/rules/cpp.mdc` referencing `AGENTS.md` and `references/`.
+---
+
+## What This Provides
+
+- `cpp-core-review` skill — safety-first C++ code review
+- C++ ownership and lifetime rules
+- clang-tidy profiles (minimal / strict / migration)
+- Runtime references (lifetime, RAII, concurrency, templates, etc.)
+- Known AI failure patterns (GOTCHAS.md)
+- Platform adapters (OpenCode, Claude Code, Cursor, Codex CLI, Gemini CLI)
+- Evals and verification scripts
+- Source for the `cpp-constitution` pipx CLI
+
+---
 
 ## Design Philosophy
 
+1. **Tool First** — clang-tidy and compiler warnings run before subjective review
+2. **Progressive Loading** — CONSTITUTION.md is small; detailed rules load on demand
+3. **Safety Before Style** — UB, lifetime, ownership, RAII come before naming or formatting
+4. **One Source of Truth** — distribution is generated from this repository
 
-### Concise is key
-Default assumption is AI is already very smart. Only add context AI doesn't already have.
-
-### Progressive loading
-Only load relevant rules when needed, not everything upfront to save tokens.
-
-### Script first, AI second
-Deterministic tasks (static analysis, format checks) handled by scripts, AI only does judgment work.
-
-### Tool backed
-Prefer static analysis tool results over subjective AI opinions.
-
-
-> **Strong constraints reduce entropy.**
-
-This project converts C++ Core Guidelines into:
-- AI-readable rules (not human documentation)
-- Static analysis constraints (not style opinions)
-- Engineering workflow hooks (not manual checklists)
-
-Every rule must justify its token cost. If the model already knows it, delete it.
+---
 
 ## Skills
 
-| Skill ID | Name | Purpose | When to Use |
-|----------|------|---------|-------------|
-| `cpp-core-review` | C++ Core Review | Code review, safety audit, AI output validation | Reviewing any non-trivial C++ code |
-| `cpp-modernize` | C++ Modernizer | C++ migration, systematic refactoring and modernization | Upgrading from older standards (C++98/C++11) to modern C++ |
-| `cpp-debug-audit` | C++ Debug & Audit | Crash debugging, memory error detection, sanitizer analysis | Debugging undefined behavior, leaks, data races or crashes |
+| Skill | Purpose | Trigger |
+|-------|---------|---------|
+| `cpp-core-review` | C++ review and safety audit | `review src/foo.cpp` |
+| `cpp-debug-audit` | crash / sanitizer / UB audit | `debug this crash` |
+| `cpp-refactor-planner` | safe refactor planning | `refactor this module` |
 
+---
 
-## Agent Roles
+## Platform Support
 
-| Agent ID | Name | Role | How to Invoke |
-|----------|------|------|---------------|
-| `cpp-reviewer` | C++ Strict Reviewer | Read-only, strict C++ code reviewer | `@cpp-reviewer review src/foo.cpp` |
-| `cpp-refactor-planner` | C++ Refactor Planner | Creates safe, step-by-step modernization plans | `@cpp-refactor-planner plan modernization` |
-| `cpp-safety-auditor` | C++ Safety Auditor | Systematic safety audit using sanitizers and static analysis | `@cpp-safety-auditor audit src/` |
+| Platform | Status | Notes |
+|----------|--------|-------|
+| OpenCode | ✅ Verified | Auto-trigger tested, Chinese output supported |
+| Claude Code | ✅ Supported | Skill directory generated |
+| OpenClaw | ✅ Supported | Used for development |
+| Cursor | Recipe | Rule file generated |
+| Codex CLI | Recipe | Adapter generated |
+| Gemini CLI | Recipe | Adapter generated |
 
+---
 
-## Progressive Loading
+## Distribution Strategy
 
-The root `SKILL.md` (~1,500 tokens) is the only thing loaded by default. Everything else loads on demand:
+| Command | Status | Purpose |
+|---------|--------|---------|
+| `pipx install cpp-constitution` | **Primary** | Persistent install |
+| `uvx cpp-constitution init .` | Supported | One-shot execution |
+| `npx cpp-constitution init .` | Planned | JS ecosystem thin wrapper |
 
-| Condition | What loads |
-|---|---|
-| Reviewing ownership/lifetime code | `references/lifetime.md` |
-| Multi-threaded code | `references/concurrency.md` |
-| Custom error handling | `references/error-handling.md` |
-| Template metaprogramming | `references/templates.md` |
-| Performance-critical paths | `references/performance.md` |
-| Full audit requested | All relevant `references/*.md` |
+`npx` will be a thin wrapper that delegates to `uvx` or `pipx`. It will NOT duplicate templates, references, or rule logic.
 
-## Token Budget
+---
 
-| Layer | Content | Cost |
-|---|---|---|
-| Index | Name + description for skill routing | ~50 tokens |
-| Load | Core SKILL.md rules | ~1,500 tokens |
-| Runtime | Specific reference docs, script results | ~0-8,000 tokens (loaded on demand only) |
+## Architecture
 
+```
+cpp-ai-constitution/
+├── SKILL.md                    # Core review skill
+├── AGENTS.md                   # Universal AI entry point
+├── GOTCHAS.md                  # Known AI failure patterns
+├── references/                 # Detailed C++ rules (9 files)
+├── config/                     # clang-tidy profiles
+├── scripts/                    # Validation and build scripts
+├── evals/                      # Evaluation test cases
+├── templates/                  # Phase 0 starter template
+├── .opencode/                  # OpenCode adapter
+├── .claude/                    # Claude Code adapter
+├── cli/                        # cpp-constitution pipx CLI source
+│   ├── cpp_constitution/       # Python package
+│   ├── templates/              # Jinja2 templates (skill, constitution, etc.)
+│   ├── tests/                  # 5 tests
+│   └── MANIFEST.in             # Package data inclusion
+└── PROJECT_CONSTITUTION.md     # Highest constraint
+```
 
-## clang-tidy Profiles
+---
 
-Three profiles for different project stages:
+## What This Is Not
 
-| Profile | Use Case | Command |
-|---|---|---|
-| `minimal` | CI baseline, low false positive rate | `--config-file=config/clang-tidy.minimal.yml` |
-| `migration` | Legacy project migration | `--config-file=config/clang-tidy.migration.yml` |
-| `strict` | New projects or strict safety reviews | `--config-file=config/clang-tidy.strict.yml` |
+- Not a C++ tutorial
+- Not a compressed copy of C++ Core Guidelines
+- Not a "modernize everything" enforcement tool
+- Not a replacement for clang-tidy, sanitizers, or tests
 
+Every rule must justify its token cost.
 
-## Scripts
+---
 
-Run deterministic tasks without burning AI tokens:
+## Verification
 
 ```bash
-# Detect C++ project structure and build system
-python3 scripts/detect_cpp_project.py
-# Locate or generate compile_commands.json for static analysis
-python3 scripts/find_compile_commands.py
-# Run clang-tidy with summary output for AI consumption
-python3 scripts/run_clang_tidy.py
-# Sync canonical skill files across multiple platform directories
-python3 scripts/sync_skill_targets.py
-# Validate repository structure, frontmatter, configs, and references
+# CLI tests
+cd cli && python3 tests/test_cli.py
+
+# Repo validation
 python3 scripts/validate_repo.py
-# Run skill routing evals
-## Eval Levels:
-##   L1 (run_evals.py): keyword simulation — smoke test for rule definitions
-##   L2 (run_evals_l2.py): adapter file consistency (structure + header + sync)
-##   L3 (run_evals_l3.py): real agent smoke eval (requires live agent)
-## L1 is NOT real platform routing verification. README must not claim otherwise.
-python3 scripts/run_evals.py       # L1: keyword simulation
-python3 scripts/run_evals_l2.py    # L2: adapter consistency
-python3 scripts/run_evals_l3.py    # L3: real agent (manual mode if no agent)
-# Generate GOTCHAS.md from structured gotchas.yaml
-python3 scripts/build_gotchas_md.py
 
+# Generate a test project
+cpp-constitution init /tmp/demo --platform opencode --std c++20 --build xmake --no-interact
+
+# Verify runtime files
+test -f /tmp/demo/config/clang-tidy.minimal.yml
+test -f /tmp/demo/references/lifetime.md
+test -f /tmp/demo/GOTCHAS.md
 ```
 
-## Review Output Format
-
-Findings categorized by severity:
-
-- **Critical** : Undefined behavior, memory corruption, data races, dangling references
-- **Major** : Fragile APIs, inconsistent error handling, hidden side effects
-- **Minor** : Readability, naming, style, local simplifications
-- **Do Not Change** : Items that should remain (ABI, legacy, performance constraints)
-
-## Directory Structure
-
-```text
-cpp-ai-constitution/
-├── AGENTS.md                       # Agent-neutral main entry (read this first)
-├── SKILL.md                        # Root skill: routing, priorities, constitution
-├── CLAUDE.md                       # Compact rule summary for Claude Code
-├── GOTCHAS.md                      # AI failure patterns in C++ (highest value content)
-├── opencode.json.example           # OpenCode configuration template
-├── project.yaml                    # Project metadata (for README generation)
-├── data/
-│   └── gotchas.yaml                # Structured gotchas for automated generation
-├── references/                     # Detailed rules (loaded conditionally)
-│   ├── rule-map.md                 # Which rules apply when
-│   ├── lifetime.md                 # Ownership and lifetime hazards
-│   ├── resource-management.md      # RAII patterns and traps
-│   ├── concurrency.md              # Thread safety rules
-│   ├── error-handling.md           # Exception and error strategy
-│   ├── interfaces.md               # API design rules
-│   ├── classes.md                  # Class design rules
-│   ├── templates.md                # Template and concept rules
-│   └── performance.md              # Performance review checklist
-├── .opencode/skills/               # OpenCode skills (3)
-│   ├── cpp-core-review/SKILL.md
-│   ├── cpp-modernize/SKILL.md
-│   ├── cpp-debug-audit/SKILL.md
-├── .opencode/agents/               # OpenCode agents (3)
-│   ├── cpp-reviewer.md
-│   ├── cpp-refactor-planner.md
-│   ├── cpp-safety-auditor.md
-├── .claude/skills/                 # Claude Code compatibility
-├── .agents/skills/                 # Generic agent compatibility
-├── scripts/                        # Automation (7 scripts)
-├── assets/                         # Templates
-├── hooks/                          # Git hooks
-├── config/                         # Tool configurations
-├── prompts/                        # Reusable AI prompts
-├── evals/                          # Skill routing tests
-├── templates/                      # Jinja2 templates + Phase 0 starter guide
-├── .github/workflows/validate.yml  # CI validation
-└── LICENSE
-```
-
-## Credits
-
-
-- C++ Core Guidelines by Bjarne Stroustrup, Herb Sutter, et al.
-
-- Perplexity Research - Designing, Refining, and Maintaining Agent Skills
-
-- OpenClaw community for skill best practices
-
+---
 
 ## License
-
 
 MIT-0
