@@ -1,0 +1,78 @@
+name: Sync to distribution repo
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'cli/**'
+      - 'references/**'
+      - 'config/**'
+      - 'GOTCHAS.md'
+      - 'SKILL.md'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout distribution repo
+        uses: actions/checkout@v4
+        with:
+          repository: zhxc372/cpp-constitution
+          token: ${{ secrets.SYNC_PAT }}
+          path: dist-repo
+
+      - name: Sync CLI source
+        run: |
+          DIST="dist-repo"
+
+          # Sync cli/ → dist src/cpp_constitution/ (src layout)
+          mkdir -p "$DIST/src/cpp_constitution"
+          cp cli/cpp_constitution/cli.py "$DIST/src/cpp_constitution/"
+          cp cli/cpp_constitution/generator.py "$DIST/src/cpp_constitution/"
+          cp cli/cpp_constitution/prompts.py "$DIST/src/cpp_constitution/"
+          cp cli/cpp_constitution/__init__.py "$DIST/src/cpp_constitution/" 2>/dev/null || true
+
+          # Sync runtime assets (references, config, gotchas)
+          cp -r cli/cpp_constitution/runtime "$DIST/src/cpp_constitution/" 2>/dev/null || true
+
+          # Sync templates
+          rm -rf "$DIST/templates"
+          cp -r cli/templates "$DIST/templates"
+
+          # Sync pyproject.toml, MANIFEST.in
+          cp cli/pyproject.toml "$DIST/pyproject.toml"
+          cp cli/MANIFEST.in "$DIST/MANIFEST.in" 2>/dev/null || true
+
+          # Sync tests
+          mkdir -p "$DIST/tests"
+          cp cli/tests/test_cli.py "$DIST/tests/" 2>/dev/null || true
+
+          # Sync README (from distribution repo, don't overwrite)
+          # Sync .gitignore
+          cp cli/.gitignore "$DIST/.gitignore" 2>/dev/null || true
+
+          echo "Synced files:"
+          cd "$DIST" && find . -not -path './.git/*' -type f | sort
+
+      - name: Commit and push to distribution repo
+        run: |
+          cd dist-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet; then
+            echo "No changes to sync"
+            exit 0
+          fi
+
+          SOURCE_COMMIT=$(cd $GITHUB_WORKSPACE && git rev-parse --short HEAD)
+          git add -A
+          git commit -m "sync: from cpp-ai-constitution@${SOURCE_COMMIT}"
+          git push

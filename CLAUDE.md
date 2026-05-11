@@ -1,3 +1,5 @@
+<!-- Adapter Notice: This file is not a source of truth. Follow PROJECT_CONSTITUTION.md and core references. -->
+
 ---
 name: cpp-ai-constitution
 description: Safety-first C++ code review skill with Tool First methodology, ownership classification, and progressive rule loading

@@ -44,7 +44,7 @@ your-project/
 └── opencode.json                        # 平台配置（仅OpenCode）
 ```
 
-根目录没有 `AGENTS.md`。没有 `CONSTITUTION.md`。零污染。
+根目录没有配置文件。所有内容在平台的skill目录内。零污染。
 
 ---
 
@@ -52,19 +52,21 @@ your-project/
 
 | 平台 | 类型 | 安装目标 |
 |------|------|---------|
-| **OpenCode** | Skill | `.opencode/skills/cpp-core-review/` |
-| **Claude Code** | Skill | `.claude/skills/cpp-core-review/` |
-| **Trae** | Skill | `.trae/skills/cpp-core-review/` |
-| **CodeBuddy** | Skill | `.codebuddy/skills/cpp-core-review/` |
-| **Gemini CLI** | Skill | `.gemini/skills/cpp-core-review/` |
-| **Cursor** | Rule | `.cursor/rules/cpp-review.mdc` |
-| **Windsurf** | Rule | `.windsurfrules` |
-| **GitHub Copilot** | Rule | `.github/copilot-instructions.md` |
-| **Amazon Q** | Rule | `.amazonq/rules/cpp-review.md` |
-| **通义灵码** | Rule | `.lingma/rules/cpp-review.md` |
-| **Void** | Rule | `.void/rules/cpp-review.md` |
-| **Codex CLI** | Generic | `AGENTS.md` |
-| **通用** | Generic | `AGENTS.md` |
+| **OpenCode** | Skill | skill目录 |
+| **Claude Code** | Skill | skill目录 |
+| **Trae** | Skill | skill目录 |
+| **CodeBuddy** | Skill | skill目录 |
+| **Gemini CLI** | Skill | skill目录 |
+| **Cursor** | Rule | rule文件 |
+| **Windsurf** | Rule | rule文件 |
+| **GitHub Copilot** | Rule | rule文件 |
+| **Amazon Q** | Rule | rule文件 |
+| **通义灵码** | Rule | rule文件 |
+| **Void** | Rule | rule文件 |
+| **Codex CLI** | Generic | AGENTS.md |
+| **通用** | Generic | AGENTS.md |
+
+> 具体路径由CLI生成，详见 [INSTALL.md](.opencode/INSTALL.md)。
 
 **Skill型**：SKILL.md + references按需加载（更丰富、结构化）。
 **Rule型**：自包含单文件（无需skill加载机制）。
