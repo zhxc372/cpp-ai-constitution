@@ -40,7 +40,7 @@ Before subjective review, discover and use project tooling:
 {% elif build == "make" %}
    Generate: `bear -- make`
 {% endif %}
-2. Find `.clang-tidy` config → use `.cpp-constitution/config/clang-tidy.minimal.yml` if missing
+2. Find `.clang-tidy` config → generate a minimal `.clang-tidy` config at project root if missing
 3. Run clang-tidy BEFORE eyeballing code
 
 **If compile_commands.json is missing**: state clearly, degrade to manual review with explicit uncertainty.
