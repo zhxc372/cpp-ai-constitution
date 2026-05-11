@@ -97,9 +97,33 @@ def test_validate_script():
     with tempfile.TemporaryDirectory() as tmp:
         target = _run_generate(tmp, name="val-test")
 
-        script = target / "scripts" / "validate.sh"
+        script = target / ".cpp-constitution" / "scripts" / "validate.sh"
         assert script.exists()
         assert script.stat().st_mode & 0o111  # executable
+
+
+def test_clean_layout():
+    """Default layout should be clean — runtime hidden in .cpp-constitution/."""
+    with tempfile.TemporaryDirectory() as tmp:
+        target = _run_generate(tmp, name="clean-test")
+
+        # These should be in root
+        assert (target / "AGENTS.md").exists()
+        assert (target / "CONSTITUTION.md").exists()
+
+        # These should NOT be in root
+        assert not (target / "GOTCHAS.md").exists(), "GOTCHAS.md should be hidden"
+        assert not (target / "references").is_dir(), "references/ should be hidden"
+        assert not (target / "config").is_dir(), "config/ should be hidden"
+        assert not (target / "scripts").is_dir(), "scripts/ should be hidden"
+        assert not (target / "agents").is_dir(), "agents/ should be hidden"
+        assert not (target / "README.md").exists(), "README.md should not be generated"
+
+        # These should be in .cpp-constitution/
+        assert (target / ".cpp-constitution" / "GOTCHAS.md").exists()
+        assert (target / ".cpp-constitution" / "references").is_dir()
+        assert (target / ".cpp-constitution" / "config").is_dir()
+        assert (target / ".cpp-constitution" / "scripts" / "validate.sh").exists()
 
 
 if __name__ == "__main__":

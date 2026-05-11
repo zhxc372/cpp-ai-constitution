@@ -55,7 +55,7 @@ Before subjective review, discover and use project tooling:
 {% elif build == "autotools" %}
    Generate: `bear -- ./configure && make`
 {% endif %}
-2. Find `.clang-tidy` config → use `config/clang-tidy.minimal.yml` if missing
+2. Find `.clang-tidy` config → use `.cpp-constitution/config/clang-tidy.minimal.yml` if missing
 3. Check compiler warning flags
 4. Run clang-tidy BEFORE eyeballing code
 
@@ -78,16 +78,16 @@ Only change ownership type after confirming: construction, destruction, transfer
 
 Load detailed rules only when relevant:
 
-- Ownership/lifetime issues → `references/lifetime.md`
-- Resource management → `references/resource-management.md`
-- Concurrency present → `references/concurrency.md`
-- Error handling design → `references/error-handling.md`
-- API/interface review → `references/interfaces.md`
-- Class design → `references/classes.md`
-- Template code → `references/templates.md`
-- Performance hot paths → `references/performance.md`
-- Full rule index → `references/rule-map.md`
-- Known AI failures → `GOTCHAS.md`
+- Ownership/lifetime issues → `.cpp-constitution/references/lifetime.md`
+- Resource management → `.cpp-constitution/references/resource-management.md`
+- Concurrency present → `.cpp-constitution/references/concurrency.md`
+- Error handling design → `.cpp-constitution/references/error-handling.md`
+- API/interface review → `.cpp-constitution/references/interfaces.md`
+- Class design → `.cpp-constitution/references/classes.md`
+- Template code → `.cpp-constitution/references/templates.md`
+- Performance hot paths → `.cpp-constitution/references/performance.md`
+- Full rule index → `.cpp-constitution/references/rule-map.md`
+- Known AI failures → `.cpp-constitution/GOTCHAS.md`
 
 Do NOT load every reference file at once.
 

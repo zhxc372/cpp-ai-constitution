@@ -165,35 +165,36 @@ def generate(args: argparse.Namespace) -> int:
             shutil.copy2(src_file, dst)
             created_files.append(rule_file)
 
-    # Platform-specific structure
+    # Platform-specific structure (agents → .cpp-constitution/agents/)
     platform_dir = template_dir / "platforms" / config.platform
     if platform_dir.exists():
         agents_dir = platform_dir / "agents"
         if agents_dir.exists():
-            copied = _copy_tree(agents_dir, target / "agents")
+            copied = _copy_tree(agents_dir, target / ".cpp-constitution" / "agents")
             created_files.extend(copied)
         for cfg in platform_dir.glob("*.example"):
             dst_name = cfg.name.replace(".example", "")
             shutil.copy2(cfg, target / dst_name)
             created_files.append(dst_name)
 
-    # === 5. Runtime files (references, config, GOTCHAS) ===
+    # === 5. Runtime files → .cpp-constitution/ (hidden, clean layout) ===
     runtime_dir = Path(__file__).parent / "runtime"
+    runtime_target = target / ".cpp-constitution"
     for item in ["references", "config", "GOTCHAS.md"]:
         src = runtime_dir / item
         if src.exists():
             if src.is_dir():
-                copied = _copy_tree(src, target / item)
+                copied = _copy_tree(src, runtime_target / item)
             else:
-                _ensure_dir((target / item).parent)
-                shutil.copy2(src, target / item)
-                copied = [item]
+                _ensure_dir((runtime_target / item).parent)
+                shutil.copy2(src, runtime_target / item)
+                copied = [f".cpp-constitution/{item}"]
             created_files.extend(copied)
 
-    # === 6. validate.sh ===
-    _render_template(env, "build_validate.sh.j2", ctx, target / "scripts" / "validate.sh")
-    (target / "scripts" / "validate.sh").chmod(0o755)
-    created_files.append("scripts/validate.sh")
+    # === 6. validate.sh → .cpp-constitution/scripts/ ===
+    _render_template(env, "build_validate.sh.j2", ctx, runtime_target / "scripts" / "validate.sh")
+    (runtime_target / "scripts" / "validate.sh").chmod(0o755)
+    created_files.append(".cpp-constitution/scripts/validate.sh")
 
     # === 7. Build system skeleton ===
     if config.build != "none":
@@ -215,11 +216,9 @@ def generate(args: argparse.Namespace) -> int:
             else:
                 print(f"  ⏭️  Skipped {output_name} (already exists)")
 
-    # === 8. README.md ===
-    readme_path = target / "README.md"
-    if not readme_path.exists():
-        _render_template(env, "readme.md.j2", ctx, readme_path)
-        created_files.append("README.md")
+    # === 8. No README overwrite ===
+    # Do NOT generate README.md in user's project root
+    # Runtime docs go to .cpp-constitution/README.md only if no root README exists
 
     # Summary
     print("\n✅ C++ review skill initialized!")

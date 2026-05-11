@@ -32,15 +32,15 @@ echo "================================"
 echo ""
 echo "--- Governance ---"
 check "CONSTITUTION.md"        "test -f CONSTITUTION.md"
-check "project_rules.compiled.md" "test -f project_rules.compiled.md"
 check "AGENTS.md"              "test -f AGENTS.md"
-check "GOTCHAS.md"             "test -f GOTCHAS.md"
+check ".cpp-constitution/"     "test -d .cpp-constitution"
 
 # 2. C++ rules
 echo ""
 echo "--- C++ Rules ---"
-check "references/"            "test -d references"
-check "config/"                "test -d config"
+check ".cpp-constitution/references/" "test -d .cpp-constitution/references"
+check ".cpp-constitution/config/"     "test -d .cpp-constitution/config"
+check ".cpp-constitution/GOTCHAS.md"  "test -f .cpp-constitution/GOTCHAS.md"
 {% if build == "cmake" %}
 # 3. Build system
 echo ""
