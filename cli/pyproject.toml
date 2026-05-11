@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cpp-constitution"
+version = "0.1.0"
+description = "CLI tool to initialize C++ AI constitution for any project"
+readme = "README.md"
+license = {text = "MIT-0"}
+requires-python = ">=3.10"
+dependencies = [
+    "jinja2>=3.1",
+    "rich>=13.0",
+]
+
+[project.scripts]
+cpp-constitution = "cpp_constitution.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cpp_constitution*"]
+
+[tool.setuptools.package-data]
+cpp_constitution = ["../templates/**/*"]

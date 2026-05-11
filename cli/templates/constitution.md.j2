@@ -1,0 +1,8 @@
+# C++ Project Config — {{ project_name }}
+
+```yaml
+cpp_standard: {{ std }}
+exceptions: {{ 'enabled' if exceptions else 'disabled' }}
+build_system: {{ build }}
+compile_commands: {% if build == 'cmake' %}cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON{% elif build == 'make' %}bear -- make{% elif build == 'xmake' %}xmake project -k compile_commands{% elif build == 'meson' %}auto in builddir{% elif build == 'autotools' %}bear -- ./configure && make{% else %}N/A{% endif %}
+```

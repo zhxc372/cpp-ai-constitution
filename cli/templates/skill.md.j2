@@ -1,0 +1,126 @@
+---
+name: cpp-core-review
+description: Load when reviewing, refactoring, modernizing, debugging, or designing non-trivial C++ code. Triggers on keywords: review, audit, refactor, modernize, safety, ownership, lifetime, RAII, memory leak, crash, UB, undefined behavior, clang-tidy.
+---
+
+# C++ Core Review — {{ project_name }}
+
+> Project config: [CONSTITUTION.md](CONSTITUTION.md)
+
+## Project Constraints
+
+- **C++ Standard:** {{ std }}
+- **Build System:** {{ build }}
+{% if not exceptions %}
+- **⚠️ Exceptions DISABLED** — no throw/try/catch, use error codes, std::expected, std::optional
+{% endif %}
+
+## Review Priority
+
+Review C++ code in this order:
+
+1. **UB / Safety** — undefined behavior, memory corruption, data races
+2. **Ownership / Lifetime** — dangling, leaks, use-after-free
+3. **RAII / Resources** — resource release, cleanup paths
+4. **Concurrency** — shared state, thread safety
+5. **Error handling** — {% if exceptions %}exception safety{% else %}error codes, std::expected/std::optional{% endif %}
+6. **API / Interface** — design, contracts
+7. **Performance** — hot paths, unnecessary copies
+8. **Style** — naming, formatting (LAST, not first)
+
+**Never mix safety-critical changes with style rewrites.**
+
+## Tool First
+
+Before subjective review, discover and use project tooling:
+
+1. Find `compile_commands.json` (required for clang-tidy)
+{% if build == "cmake" %}
+   Generate: `cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+{% elif build == "make" %}
+   Generate: `bear -- make`
+{% elif build == "xmake" %}
+   Generate: `xmake project -k compile_commands`
+{% elif build == "meson" %}
+   Auto-generated in build directory
+{% elif build == "autotools" %}
+   Generate: `bear -- ./configure && make`
+{% endif %}
+2. Find `.clang-tidy` config → use `config/clang-tidy.minimal.yml` if missing
+3. Check compiler warning flags
+4. Run clang-tidy BEFORE eyeballing code
+
+**If compile_commands.json is missing**: state clearly, degrade to manual review with explicit uncertainty.
+
+## Ownership Classification
+
+Do NOT mechanically replace raw pointers. Classify first:
+
+1. **Owning** → use smart pointer or RAII wrapper
+2. **Non-owning observer** → keep raw pointer or reference
+3. **Borrowed parameter** → pass by reference/pointer, document lifetime
+4. **Nullable optional** → `std::optional<std::reference_wrapper<T>>` or raw pointer with null check
+5. **C API boundary** → isolate, document ownership transfer point
+6. **Legacy escape hatch** → document why, add TODO for migration
+
+Only change ownership type after confirming: construction, destruction, transfer, aliasing, and ABI constraints.
+
+## Condition Loading
+
+Load detailed rules only when relevant:
+
+- Ownership/lifetime issues → `references/lifetime.md`
+- Resource management → `references/resource-management.md`
+- Concurrency present → `references/concurrency.md`
+- Error handling design → `references/error-handling.md`
+- API/interface review → `references/interfaces.md`
+- Class design → `references/classes.md`
+- Template code → `references/templates.md`
+- Performance hot paths → `references/performance.md`
+- Full rule index → `references/rule-map.md`
+- Known AI failures → `GOTCHAS.md`
+
+Do NOT load every reference file at once.
+
+## Modernization Discipline
+
+Separate changes into distinct commits:
+
+1. **Safety fixes** (do first, highest priority)
+2. **Behavior-preserving refactors** (second)
+3. **Modern C++ adoption** (third)
+4. **Style improvements** (last)
+
+Do NOT modernize code before preserving behavior.
+Do NOT replace legacy code just because it looks old.
+
+## Output Format
+
+Categorize findings by severity:
+
+- **🔴 UB/Safety** — undefined behavior, memory corruption, data races
+- **🟠 Ownership** — lifetime bugs, resource leaks, dangling references
+- **🟡 Correctness** — logic errors, wrong API usage
+- **🔵 Modernization** — style improvements, modern C++ opportunities
+- **⚪ Style** — naming, formatting, readability
+
+**Actionable comments only.** No nitpicks without engineering value.
+
+## Human Decision Rights
+
+AI must NOT decide:
+- Ownership model changes (propose only)
+- ABI-impacting changes
+- Large refactors without explicit approval
+{% if not exceptions %}
+- Introducing exceptions or exception-throwing APIs
+{% endif %}
+
+## Rules of This Skill
+
+1. This is NOT a C++ textbook. It prevents high-impact mistakes AI often makes.
+2. Root skill stays short. Heavy material in `references/`.
+3. Prefer mechanical checks over subjective review.
+4. Never apply Core Guidelines mechanically without understanding context.
+5. Every rule comes from: repeated model failure, known safety hazard, project constraint, or tool-detectable issue.
+6. AI may not self-approve changes to this skill or project constitution.
