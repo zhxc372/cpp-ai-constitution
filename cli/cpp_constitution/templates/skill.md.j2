@@ -15,6 +15,15 @@ description: Load when reviewing, refactoring, modernizing, debugging, or design
 - **⚠️ Exceptions DISABLED** — no throw/try/catch, use error codes, std::expected, std::optional
 {% endif %}
 
+## Output Language
+
+Match the user's language:
+- If the user writes in Chinese → respond in Chinese (中文)
+- If the user writes in English → respond in English
+- If ambiguous → default to the language of CONSTITUTION.md or project files
+- Always keep code, identifiers, and technical terms in English
+- Keep severity markers (🔴🟠🟡🔵⚪) regardless of language
+
 ## Review Priority
 
 Review C++ code in this order:
