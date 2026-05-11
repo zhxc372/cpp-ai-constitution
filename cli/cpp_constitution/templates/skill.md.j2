@@ -1,11 +1,11 @@
 ---
 name: cpp-core-review
-description: Load when reviewing, refactoring, modernizing, debugging, or designing non-trivial C++ code. Triggers on keywords: review, audit, refactor, modernize, safety, ownership, lifetime, RAII, memory leak, crash, UB, undefined behavior, clang-tidy.
+description: Load when reviewing, refactoring, modernizing, debugging, or designing non-trivial C++ code. Triggers on keywords: review, audit, refactor, modernize, safety, ownership, lifetime, RAII, memory leak, crash, UB, undefined behavior, clang-tidy, 审查, 检查.
 ---
 
 # C++ Core Review — {{ project_name }}
 
-> Project config: [CONSTITUTION.md](CONSTITUTION.md)
+> Project config: [project-config.md](project-config.md)
 
 ## Project Constraints
 
@@ -20,7 +20,7 @@ description: Load when reviewing, refactoring, modernizing, debugging, or design
 Match the user's language:
 - If the user writes in Chinese → respond in Chinese (中文)
 - If the user writes in English → respond in English
-- If ambiguous → default to the language of CONSTITUTION.md or project files
+- If ambiguous → default to the language of project files
 - Always keep code, identifiers, and technical terms in English
 - Keep severity markers (🔴🟠🟡🔵⚪) regardless of language
 
@@ -41,25 +41,60 @@ Review C++ code in this order:
 
 ## Tool First
 
-Before subjective review, discover and use project tooling:
+Before subjective review, discover and run available static analysis tools:
 
-1. Find `compile_commands.json` (required for clang-tidy)
+### Step 1: compile_commands.json
+
+Required for most tools. Generate if missing:
+
 {% if build == "cmake" %}
-   Generate: `cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
-{% elif build == "make" %}
-   Generate: `bear -- make`
+```
+cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+```
 {% elif build == "xmake" %}
-   Generate: `xmake project -k compile_commands`
+```
+xmake project -k compile_commands
+```
+{% elif build == "make" %}
+```
+bear -- make
+```
 {% elif build == "meson" %}
-   Auto-generated in build directory
+Auto-generated in build directory after `meson setup build`.
 {% elif build == "autotools" %}
-   Generate: `bear -- ./configure && make`
+```
+bear -- ./configure && make
+```
 {% endif %}
-2. Find `.clang-tidy` config → use `.cpp-constitution/config/clang-tidy.minimal.yml` if missing
-3. Check compiler warning flags
-4. Run clang-tidy BEFORE eyeballing code
 
-**If compile_commands.json is missing**: state clearly, degrade to manual review with explicit uncertainty.
+### Step 2: Static Analysis Tools (run BEFORE eyeballing code)
+
+Try tools in order. Skip any that aren't installed — don't block on missing tools.
+
+| Tool | What it catches | Command |
+|------|----------------|---------|
+| **clang-tidy** | Bug-prone patterns, modernization, readability | `clang-tidy -p build <file>` |
+| **cppcheck** | Buffer overflows, leaks, undefined behavior | `cppcheck --enable=all <file>` |
+| **clazy** | Qt-specific anti-patterns (if Qt project) | `clazy -p build <file>` |
+| **include-what-you-use** | Unnecessary includes, forward decls | `iwyu -p build <file>` |
+
+### Step 3: Compiler Warnings
+
+Check compiler warning level. Suggest upgrading if low:
+
+```bash
+# GCC/Clang recommended baseline
+-Wall -Wextra -Wpedantic -Wconversion -Wshadow
+
+# Stricter (recommended for new projects)
+-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Werror=return-type
+```
+
+### clang-tidy Config
+
+Find `.clang-tidy` at project root. If missing, use `config/clang-tidy.minimal.yml` from this skill directory.
+
+**If no tools are available**: state clearly, degrade to manual review with explicit uncertainty.
 
 ## Ownership Classification
 
@@ -76,18 +111,18 @@ Only change ownership type after confirming: construction, destruction, transfer
 
 ## Condition Loading
 
-Load detailed rules only when relevant:
+Load detailed rules only when relevant (all files are in this skill directory):
 
-- Ownership/lifetime issues → `.cpp-constitution/references/lifetime.md`
-- Resource management → `.cpp-constitution/references/resource-management.md`
-- Concurrency present → `.cpp-constitution/references/concurrency.md`
-- Error handling design → `.cpp-constitution/references/error-handling.md`
-- API/interface review → `.cpp-constitution/references/interfaces.md`
-- Class design → `.cpp-constitution/references/classes.md`
-- Template code → `.cpp-constitution/references/templates.md`
-- Performance hot paths → `.cpp-constitution/references/performance.md`
-- Full rule index → `.cpp-constitution/references/rule-map.md`
-- Known AI failures → `.cpp-constitution/GOTCHAS.md`
+- Ownership/lifetime issues → `references/lifetime.md`
+- Resource management → `references/resource-management.md`
+- Concurrency present → `references/concurrency.md`
+- Error handling design → `references/error-handling.md`
+- API/interface review → `references/interfaces.md`
+- Class design → `references/classes.md`
+- Template code → `references/templates.md`
+- Performance hot paths → `references/performance.md`
+- Full rule index → `references/rule-map.md`
+- Known AI failures → `GOTCHAS.md`
 
 Do NOT load every reference file at once.
 
@@ -132,13 +167,13 @@ AI must NOT decide:
 3. Prefer mechanical checks over subjective review.
 4. Never apply Core Guidelines mechanically without understanding context.
 5. Every rule comes from: repeated model failure, known safety hazard, project constraint, or tool-detectable issue.
-6. AI may not self-approve changes to this skill or project constitution.
+6. AI may not self-approve changes to this skill or project config.
 
 ## When This Skill MUST Be Used
 
 Do NOT review C++ code without loading this skill first. Always:
 1. Read this SKILL.md
-2. Run Tool First (compile_commands.json → clang-tidy)
+2. Run Tool First (compile_commands.json → static analysis)
 3. Then produce findings by priority
 
 Trigger keywords: review, audit, check, inspect, refactor, modernize, safety, ownership, lifetime, RAII, memory leak, crash, UB, clang-tidy, 审查, 检查

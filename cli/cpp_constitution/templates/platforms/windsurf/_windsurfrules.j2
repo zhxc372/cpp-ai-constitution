@@ -30,22 +30,60 @@ Review C++ code in this order (NEVER mix safety-critical changes with style rewr
 
 ## Tool First
 
-Before subjective review, discover and use project tooling:
+Before subjective review, discover and run available static analysis tools:
 
-1. Find `compile_commands.json` (required for clang-tidy)
+### Step 1: compile_commands.json
+
+Required for most tools. Generate if missing:
 {% if build == "cmake" %}
-   Generate: `cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+```bash
+cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+```
 {% elif build == "xmake" %}
-   Generate: `xmake project -k compile_commands`
+```bash
+xmake project -k compile_commands
+```
 {% elif build == "make" %}
-   Generate: `bear -- make`
+```bash
+bear -- make
+```
+{% elif build == "meson" %}
+Auto-generated in build directory after `meson setup build`.
+{% elif build == "autotools" %}
+```bash
+bear -- ./configure && make
+```
 {% endif %}
-2. Find `.clang-tidy` config → generate a minimal `.clang-tidy` config at project root if missing
-3. Run clang-tidy BEFORE eyeballing code
 
-**If compile_commands.json is missing**: state clearly, degrade to manual review with explicit uncertainty.
+### Step 2: Static Analysis Tools (run BEFORE eyeballing code)
 
-## Ownership Classification
+Try tools in order. Skip any that aren't installed.
+
+| Tool | What it catches | Command |
+|------|----------------|---------|
+| **clang-tidy** | Bug-prone patterns, modernization, readability | `clang-tidy -p build <file>` |
+| **cppcheck** | Buffer overflows, leaks, undefined behavior | `cppcheck --enable=all <file>` |
+| **clazy** | Qt-specific anti-patterns (if Qt project) | `clazy -p build <file>` |
+| **include-what-you-use** | Unnecessary includes, forward decls | `iwyu -p build <file>` |
+
+### Step 3: Compiler Warnings
+
+Check compiler warning level. Suggest upgrading if low:
+```bash
+# Recommended baseline
+-Wall -Wextra -Wpedantic -Wconversion -Wshadow
+```
+
+### clang-tidy Config
+
+Find `.clang-tidy` at project root. If missing, generate a minimal config:
+```yaml
+Checks: 'bugprone-*, modernize-*, readability-*, performance-*, -modernize-use-trailing-return-type'
+```
+
+**If NO tools are available**: clearly state "⚠️ No static analysis tools found. Using AI-only review — lower confidence on mechanical issues. Recommend installing clang-tidy or cppcheck for better coverage."
+
+## Ownership Classification## Ownership Classification
 
 Do NOT mechanically replace raw pointers. Classify first:
 
