@@ -194,7 +194,7 @@ def generate(args: argparse.Namespace) -> int:
             created_files.extend(copied)
 
     # === 6. validate.sh ===
-    _render_template(env, "build/validate.sh.j2", ctx, target / "scripts" / "validate.sh")
+    _render_template(env, "build_validate.sh.j2", ctx, target / "scripts" / "validate.sh")
     (target / "scripts" / "validate.sh").chmod(0o755)
     created_files.append("scripts/validate.sh")
 
@@ -207,7 +207,7 @@ def generate(args: argparse.Namespace) -> int:
             "meson": "meson.build",
             "autotools": "configure.ac",
         }
-        build_template = f"build/{config.build}.j2"
+        build_template = f"build_{config.build}.j2"
         output_name = build_file_map.get(config.build)
         if output_name and (template_dir / build_template).exists():
             output_path = target / output_name

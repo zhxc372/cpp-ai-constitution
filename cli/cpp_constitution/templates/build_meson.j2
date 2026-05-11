@@ -1,0 +1,14 @@
+project('{{ project_name }}', 'cpp',
+  version: '0.1.0',
+  default_options: ['cpp_std={{ std }}'{% if not exceptions %}, 'b_lundef=false'{% endif %}]
+)
+
+executable('{{ project_name }}',
+  sources: files('src/*.cpp'),
+  include_directories: 'include',
+{% if not exceptions %}
+  cpp_args: ['-fno-exceptions'],
+{% endif %}
+)
+
+test = find_program('meson', required: false)

@@ -1,0 +1,16 @@
+AC_INIT([{{ project_name }}], [0.1.0])
+AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+AC_PROG_CXX
+AM_PROG_AR
+LT_INIT
+
+AC_LANG(C++)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])],[],[])
+
+{% if not exceptions %}
+AX_CHECK_COMPILE_FLAG([-fno-exceptions], [CXXFLAGS="$CXXFLAGS -fno-exceptions"])
+{% endif %}
+CXXFLAGS="$CXXFLAGS -std=c++{{ std_version }} -Wall -Wextra"
+
+AC_CONFIG_FILES([Makefile src/Makefile])
+AC_OUTPUT

@@ -1,0 +1,27 @@
+CXX ?= g++
+CXXFLAGS := -std=c++{{ std_version }} -Wall -Wextra -Werror{% if not exceptions %} -fno-exceptions{% endif %}
+SRCDIR := src
+BUILDDIR := build
+TARGET := {{ project_name }}
+
+SOURCES := $(shell find $(SRCDIR) -name '*.cpp')
+OBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SOURCES))
+
+.PHONY: all clean test
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
+
+test: $(TARGET)
+	@echo "No tests configured yet."
+
+clean:
+	rm -rf $(BUILDDIR) $(TARGET)
